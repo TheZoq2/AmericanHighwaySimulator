@@ -6,3 +6,7 @@ Level::Level(int num_lanes) {
 
 Level::~Level() { }
 
+void Level::update() {
+
+}
+
