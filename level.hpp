@@ -1,6 +1,10 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include <vector>
+#include "car.hpp"
+#include "player.hpp"
+
 class Level {
 
 public:
@@ -11,6 +15,9 @@ public:
 private:
 
     int num_lanes;
+
+    std::vector<Car> cars;
+    std::vector<Player> players;
 
 };
 
