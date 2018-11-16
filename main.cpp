@@ -9,7 +9,16 @@ int main() {
 
     Level level(5);
     Assets assets;
+
     while(true) {
+
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+        }
+
         level.update();
 
         window.clear(sf::Color::Black);
