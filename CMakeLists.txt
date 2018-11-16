@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(OhCrapImBlind)
+project(AmericanHighwaySimulator)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wno-unused -pedantic -lsfml-graphics -lsfml-window -lsfml-system")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -9,7 +9,7 @@ file(GLOB OhCrapImBlind_SRC
     )
 
 
-set(EXECUTABLE_NAME "imblind")
+set(EXECUTABLE_NAME "ahs")
 
 add_executable(${EXECUTABLE_NAME} ${OhCrapImBlind_SRC})
 
@@ -21,8 +21,6 @@ find_package(SFML 2 REQUIRED system window graphics network audio)
 if(${SFML_FOUND})
     # message("${SFML_INCLUDE_DIR}")
   include_directories(${SFML_INCLUDE_DIR})
-  message(${SFML_INCLUDE_DIR})
-  message(${SFML_LIBRARIES})
   target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES})
 endif()
 

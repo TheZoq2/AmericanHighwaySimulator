@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "assets.hpp"
+
 enum class VehicleType {
     CAR,
     TRUCK,
@@ -14,6 +16,8 @@ class Car {
 public:
 
     Car(VehicleType type, sf::Vector2f position);
+
+    void draw(sf::RenderTarget* target, Assets& assets) const;
 
 private:
     
