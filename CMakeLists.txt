@@ -11,6 +11,7 @@ file(GLOB OhCrapImBlind_SRC
 
 set(EXECUTABLE_NAME "ahs")
 
+
 add_executable(${EXECUTABLE_NAME} ${OhCrapImBlind_SRC})
 
 # Detect and add SFML
@@ -24,4 +25,5 @@ if(${SFML_FOUND})
   target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES})
 endif()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

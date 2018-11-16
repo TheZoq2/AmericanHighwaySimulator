@@ -8,7 +8,6 @@
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, 1080), "American highway simulator");
 
-
     Level level(5);
     Assets assets;
     while(true) {
