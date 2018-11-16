@@ -10,7 +10,7 @@ int main() {
     Level level(5);
     Assets assets;
 
-    while(true) {
+    while(window.isOpen()) {
 
         sf::Event event;
         while (window.pollEvent(event)) {
