@@ -3,9 +3,10 @@
 
 #include "level.hpp"
 #include "assets.hpp"
+#include "consts.hpp"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(1080, 1080), "American highway simulator");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, 1080), "American highway simulator");
 
 
     Level level(5);
