@@ -9,9 +9,16 @@ Level::Level(int num_lanes) {
 Level::~Level() { }
 
 
-
 void Level::draw(sf::RenderTarget* target, Assets& assets) const {
     for(auto car: cars) {
         car.draw(target, assets);
     }
 }
+
+
+void Level::update() {
+    for(auto& car: cars) {
+        car.update();
+    }
+}
+

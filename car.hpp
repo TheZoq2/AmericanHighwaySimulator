@@ -19,6 +19,8 @@ public:
 
     void draw(sf::RenderTarget* target, Assets& assets) const;
 
+    void update();
+
 private:
     
     VehicleType type;
