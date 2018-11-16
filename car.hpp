@@ -21,11 +21,12 @@ public:
 
     void update();
 
+    sf::Vector2f position;
+
 private:
     
     VehicleType type;
 
-    sf::Vector2f position;
 
 };
 

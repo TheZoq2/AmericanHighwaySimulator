@@ -1,5 +1,9 @@
 #include "level.hpp"
 
+#include "consts.hpp"
+
+#include <algorithm>
+
 Level::Level(int num_lanes) {
     this->num_lanes = num_lanes;
 
@@ -20,5 +24,12 @@ void Level::update() {
     for(auto& car: cars) {
         car.update();
     }
+
+    std::vector<Car> new_cars;
+    std::copy_if(cars.begin(), cars.end(), std::back_inserter(new_cars), [&](auto car) {
+        return car.position.y < WINDOW_HEIGHT * 2;
+    });
+
+    this->cars = new_cars;
 }
 
