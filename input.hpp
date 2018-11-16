@@ -22,6 +22,6 @@ namespace input {
 
     };
 
-};
+}
 
 #endif /* ifndef INPUT_H */
