@@ -7,6 +7,8 @@
 #include "player.hpp"
 #include "input.hpp"
 
+const float PLAYER_SPEED = 2.;
+
 class Level {
 
 public:
@@ -16,7 +18,11 @@ public:
 
     void update();
 
+    void add_player(Player& player);
+
 private:
+
+    void handle_input();
 
     int num_lanes;
 
