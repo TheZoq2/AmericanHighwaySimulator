@@ -1,15 +1,31 @@
 #include <SFML/Window.hpp>
 #include "level.hpp"
-#include <unistd.h>
+#include "assets.hpp"
+#include "consts.hpp"
 
 int main() {
-    sf::Window window(sf::VideoMode(1080, 1080), "American highway simulator");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "American highway simulator");
 
-    Level level{3};
+    Level level(5);
+    Assets assets;
 
-    while(true) {
+    while(window.isOpen()) {
+
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+        }
+
         level.update();
-        usleep(100000);
+
+// TODO implement timer based movement
+        window.clear(sf::Color::Black);
+
+        level.draw(&window, assets);
+
+        window.display();
     }
 
     return 0;

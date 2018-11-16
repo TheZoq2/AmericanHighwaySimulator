@@ -16,6 +16,7 @@ public:
     Level(int num_lanes);
     ~Level();
 
+    void draw(sf::RenderTarget* target, Assets& assets) const;
     void update();
 
     void add_player(Player& player);
