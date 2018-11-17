@@ -17,6 +17,8 @@ const int CAR_SPEED = 100;
 
 const int PLAYER_WIDTH = 119;
 const int PLAYER_HEIGHT = 249;
-const float PLAYER_ACCELERATION = 100;
+const float PLAYER_ACCELERATION_X = 1000;
+const float PLAYER_ACCELERATION_Y = 300;
+const float PLAYER_MAX_VEL_X = 1000;
 
 #endif

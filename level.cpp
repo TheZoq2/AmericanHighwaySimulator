@@ -55,16 +55,16 @@ void Level::handle_input(float delta_time) {
     for (auto& player : players) {
         int dx{0}, dy{0};
         if (player.is_pressed(input::Action::DOWN)) {
-            dy += PLAYER_ACCELERATION;
+            dy += PLAYER_ACCELERATION_Y;
         }
         if (player.is_pressed(input::Action::UP)) {
-            dy -= PLAYER_ACCELERATION;
+            dy -= PLAYER_ACCELERATION_Y;
         }
         if (player.is_pressed(input::Action::LEFT)) {
-            dx -= PLAYER_ACCELERATION;
+            dx -= PLAYER_ACCELERATION_X;
         }
         if (player.is_pressed(input::Action::RIGHT)) {
-            dx += PLAYER_ACCELERATION;
+            dx += PLAYER_ACCELERATION_X;
         }
 
         sf::Vector2f acceleration(dx, dy);
@@ -72,12 +72,18 @@ void Level::handle_input(float delta_time) {
 
         player.velocity += acceleration;
 
+        if (player.velocity.x > PLAYER_MAX_VEL_X) {
+            player.velocity.x = PLAYER_MAX_VEL_X;
+        }
+        if (-player.velocity.x < -PLAYER_MAX_VEL_X) {
+            player.velocity.x = PLAYER_MAX_VEL_X;
+        }
+
         sf::Vector2f new_pos = player.position + player.velocity * delta_time;
         Player* collided = get_colliding_player(&player, new_pos);
         if (collided == nullptr) {
             player.position += player.velocity * delta_time;
         } else {
-
             // this is to prevent on_player_collision to be fired
             // more than once per collision
             if (player.just_collided_with != collided) {

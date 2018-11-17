@@ -13,7 +13,7 @@ bool Player::is_pressed(const input::Action ac) {
 }
 
 void Player::draw(sf::RenderTarget* target, Assets& assets) const {
-    float visual_angle = atan2(0, velocity.x) * 10;
+    float visual_angle = atan2(velocity.x, 100) * 10;
 
     assets.generic_car.draw(target, this->position, visual_angle);
 }
