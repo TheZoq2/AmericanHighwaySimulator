@@ -19,6 +19,7 @@ public:
 
     std::string name;
     sf::Vector2f position;
+    Player* just_collided_with;
 
 private:
 
