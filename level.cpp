@@ -54,8 +54,15 @@ void Level::update(float delta_time) {
         spawn_car();
     }
 
+    // Filter removed lanes
+    std::vector<Lane> new_lanes;
+    std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(new_lanes), [&](auto lane) {
+        return lane.position.y < WINDOW_HEIGHT;
+    });
+    this->lanes = new_lanes;
+
     // Add new lanes
-    if (lanes.size() < lane_amount * 2) {
+    while (lanes.size() < lane_amount * 2) {
         for (int i = 0; i < lane_amount; i++) {
             add_lane(i);
         }
@@ -166,6 +173,12 @@ void Level::spawn_car() {
     this->cars.push_back(Car(sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset)));
 }
 
+void Level::add_lane(int lane_num) {
+    auto x_position = WINDOW_CENTER - (LANE_WIDTH*lane_amount/2) + LANE_WIDTH * lane_num;
+
+    this->lanes.push_back(Lane(sf::Vector2f(x_position, 100)));
+}
+
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     if (collided->wrecked) {
         collider->wrecked;
@@ -180,12 +193,6 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
 
     std::cout << collider->name << " collided with " 
         << collided->name << "!" << std::endl;
-}
-
-void Level::add_lane(int lane_num) {
-    auto position = WINDOW_CENTER - (LANE_WIDTH*lane_amount/2) + LANE_WIDTH * lane_num;
-
-    this->lanes.push_back(Lane(sf::Vector2f(position, 0)));
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c) {
