@@ -13,6 +13,8 @@ Car::Car(VehicleType type, sf::Vector2f position) {
     this->width = PLAYER_WIDTH;
     this->height = PLAYER_HEIGHT;
     this->wrecked = false;
+
+    this->velocity = CAR_SPEED + (random() % CAR_SPEED_VARIATION);
 }
 
 void Car::draw(sf::RenderTarget* target, Assets& assets) const {
@@ -22,7 +24,7 @@ void Car::draw(sf::RenderTarget* target, Assets& assets) const {
 
 void Car::update(float delta) {
     if (!this->wrecked) {
-        this->position.y += delta * CAR_SPEED;
+        this->position.y += delta * velocity;
     } else {
         this->position.y += delta * ROAD_SPEED;
     }
