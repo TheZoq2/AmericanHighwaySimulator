@@ -15,7 +15,7 @@ const int CAR_DESPAWN_Y = WINDOW_HEIGHT - CAR_SPAWN_Y;
 const int CAR_SPAWN_MAX_OFFSET = -CAR_SPAWN_Y + CAR_DESPAWN_Y;
 const int CAR_SPEED = 100;
 const int CAR_SPEED_VARIATION = 100;
-const float ROAD_SPEED = 400;
+const float ROAD_SPEED = 800;
 
 const int PLAYER_WIDTH = 119;
 const int PLAYER_HEIGHT = 249;
