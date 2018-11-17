@@ -65,7 +65,7 @@ private:
     std::vector<Player> players;
     std::vector<Lane> lanes;
 
-    int lane_amount = 3;
+    int lane_amount = 6;
 
     int road_width;
 

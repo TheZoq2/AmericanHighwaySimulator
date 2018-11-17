@@ -14,9 +14,7 @@ Player::Player(
     this->powerup = nullptr;
     this->persistent_acceleration = sf::Vector2f(0, 0);
 
-    r = random() % 255;
-    g = random() % 255;
-    b = random() % 255;
+    new_color();
 }
 
 
@@ -38,3 +36,9 @@ void Player::set_powerup(PowerUp* p) {
     this->powerup = p;
 }
 
+
+void Player::new_color() {
+    r = random() % 255;
+    g = random() % 255;
+    b = random() % 255;
+}

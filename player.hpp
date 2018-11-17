@@ -19,6 +19,7 @@ public:
     void draw(sf::RenderTarget* target, Assets& assets) const;
 
     void set_powerup(PowerUp* p);
+    void new_color();
 
     std::string name;
     sf::Vector2f position;
