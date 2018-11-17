@@ -140,6 +140,13 @@ void Level::spawn_car() {
 }
 
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
+    float sign = -1;
+    if(collider->position.x > collided->position.x) {
+        sign = 1;
+    }
+    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
+    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1;
+
     // TODO do something fun
     std::cout << collider->name << " collided with " 
         << collided->name << "!" << std::endl;
