@@ -26,6 +26,9 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
         player.draw(target, assets);
     }
 
+    for (auto& powerup : powerups) {
+        powerup.draw(target, assets);
+    }
 }
 
 
@@ -55,7 +58,7 @@ void Level::update(float delta_time) {
     }
 
     // Add new lanes
-    if (lanes.size() < lane_amount * 2) {
+    if (lanes.size() < (size_t)lane_amount * 2) {
         for (int i = 0; i < lane_amount; i++) {
             add_lane(i);
         }
@@ -67,6 +70,7 @@ void Level::update(float delta_time) {
     }
 
     update_players_handle_input(delta_time);
+    update_and_spawn_powerups(delta_time);
 }
 
 void Level::update_players_handle_input(float delta_time) {
@@ -156,6 +160,7 @@ void Level::add_player(Player& player) {
 //          Private members
 ////////////////////////////////////////////////////////////////////////////////
 
+
 void Level::spawn_car() {
     auto lane = random() % lane_amount;
     // +0.5 to put the car in the center of the lane rather than on the side
@@ -231,5 +236,64 @@ void Level::check_if_players_within_bounds() {
             player.wrecked = true;
         }
     }
+}
+
+void Level::spawn_powerup() {
+    auto lane = random() % lane_amount;
+    // +0.5 to put the car in the center of the lane rather than on the side
+    auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
+
+    auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
+
+    PowerUpType type = static_cast<PowerUpType>(random() % NUM_POWERUPS);
+    this->powerups.push_back(
+            PowerUp {sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset), 
+            type, 0});
+}
+
+void Level::update_and_spawn_powerups(float delta_time) {
+    // maybe spawn powerup
+    auto r = random() % (int)(1/POWERUP_SPAWN_PROBABILITY);
+    if (r == 0) {
+        spawn_powerup();
+        std::cout << "SPAWNED POWERUP" << std::endl;
+    }
+
+    // update powerups
+    for (auto& powerup : powerups) {
+        powerup.position.y += ROAD_SPEED*delta_time;
+        powerup.angle += POWERUP_ANGLE_SPEED*delta_time;
+    }
+    
+    // check for player collisions
+    std::vector<size_t> indices_to_remove;
+    for (size_t i{0}; i < powerups.size(); ++i) {
+        PowerUp* powerup = &powerups[i];
+        for (auto& player : players) {
+            if (powerup_collides_with_player(powerup, &player)) {
+                // copy the powerup to the player
+                PowerUp* p = new PowerUp(*powerup);
+                player.set_powerup(p);
+                indices_to_remove.push_back(i);
+            }
+        }
+    }
+    // remove the picked-up powerups
+    for (auto i : indices_to_remove) {
+        powerups.erase(powerups.begin() + i);
+    }
+}
+
+bool Level::powerup_collides_with_player(PowerUp* pu, Player* p) const {
+    return std::abs(p->position.x - pu->position.x) < POWERUP_WIDTH &&
+           std::abs(p->position.y - pu->position.y) < POWERUP_HEIGHT;
+}
+
+void Level::activate_sleepy_powerup() {
+    std::cout << "Sleepy!" << std::endl;
+}
+
+void Level::activate_transparency_powerup() {
+    std::cout << "Transparency!" << std::endl;
 }
 

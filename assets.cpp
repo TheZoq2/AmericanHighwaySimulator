@@ -25,6 +25,7 @@ void Asset::draw(sf::RenderTarget* target, sf::Vector2f position, float angle) {
 
 Assets::Assets() :
     generic_car("../resources/car.png"),
-    lane("../resources/lane.png")
+    lane("../resources/lane.png"),
+    powerup("../resources/powerup.png")
 {
 }

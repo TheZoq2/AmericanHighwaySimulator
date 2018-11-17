@@ -23,5 +23,6 @@ public:
 
     Asset generic_car;
     Asset lane;
+    Asset powerup;
 };
 #endif
