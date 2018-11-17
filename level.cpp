@@ -181,7 +181,7 @@ void Level::add_lane(int lane_num) {
 
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     if (collided->wrecked) {
-        collider->wrecked;
+        collider->wrecked = true;
     }
     float avg_velocity = (collider->velocity.x - collider->velocity.x) / 2;
     float sign = -1;
