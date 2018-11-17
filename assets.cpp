@@ -40,7 +40,8 @@ Assets::Assets() :
     lane("../resources/lane.png"),
     powerup("../resources/powerup.png"),
     sleep("../resources/sleep.png"),
-    transparency("../resources/transparency.png")
+    transparency("../resources/transparency.png"),
+    rock("../resources/rock.png")
 {
     lane.set_origin(0,0);
 }

@@ -14,11 +14,21 @@ Car::Car(VehicleType type, sf::Vector2f position) {
     this->height = PLAYER_HEIGHT;
     this->wrecked = false;
 
-    this->velocity = CAR_SPEED + (random() % CAR_SPEED_VARIATION);
+    if(type == VehicleType::ROCK) {
+        this->velocity = ROAD_SPEED;
+    }
+    else {
+        this->velocity = CAR_SPEED + (random() % CAR_SPEED_VARIATION);
+    }
 }
 
 void Car::draw(sf::RenderTarget* target, Assets& assets) const {
-    assets.generic_car.draw(target, this->position);
+    if(type == VehicleType::ROCK) {
+        assets.rock.draw(target, this->position);
+    }
+    else {
+        assets.generic_car.draw(target, this->position);
+    }
 }
 
 

@@ -29,5 +29,6 @@ public:
     Asset powerup;
     Asset sleep;
     Asset transparency;
+    Asset rock;
 };
 #endif
