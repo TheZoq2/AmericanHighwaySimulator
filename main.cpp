@@ -11,6 +11,7 @@
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "American highway simulator");
+    window.setVerticalSyncEnabled(true);
     sf::Texture bg_texture;
     bg_texture.setRepeated(true);
     bg_texture.loadFromFile("../resources/grass.png");
@@ -72,14 +73,17 @@ int main() {
                 bg_sprite.setPosition(bg_pos.x, -WINDOW_HEIGHT);
             }
             else {
-                bg_sprite.setPosition(bg_pos.x, bg_pos.y + 1);
+                bg_sprite.setPosition(bg_pos.x, bg_pos.y + ROAD_SPEED * next_time_step);
             }
 
             if (bg_second_pos.y > WINDOW_HEIGHT) {
                 bg_sprite_second.setPosition(bg_second_pos.x, -WINDOW_HEIGHT);
             }
             else {
-                bg_sprite_second.setPosition(bg_second_pos.x, bg_second_pos.y + 1);
+                bg_sprite_second.setPosition(
+                    bg_second_pos.x,
+                    bg_second_pos.y + ROAD_SPEED * next_time_step
+                );
             }
             window.draw(bg_sprite);
             window.draw(bg_sprite_second);
