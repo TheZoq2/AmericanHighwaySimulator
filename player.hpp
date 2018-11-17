@@ -24,8 +24,9 @@ public:
     float angle;
 
     input::InputHandler* input_handler;
-private:
 
+private:
+    float r, g, b;
 
 };
 

@@ -30,6 +30,7 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
 
 
 void Level::update(float delta_time) {
+    check_if_players_within_bounds();
     // Update lanes
     for (auto& lane : lanes) {
         lane.update(delta_time);
@@ -53,8 +54,15 @@ void Level::update(float delta_time) {
         spawn_car();
     }
 
+    // Filter removed lanes
+    std::vector<Lane> new_lanes;
+    std::copy_if(lanes.begin(), lanes.end(), std::back_inserter(new_lanes), [&](auto lane) {
+        return lane.position.y < WINDOW_HEIGHT;
+    });
+    this->lanes = new_lanes;
+
     // Add new lanes
-    if (lanes.size() < lane_amount * 2) {
+    while (lanes.size() < lane_amount * 2) {
         for (int i = 0; i < lane_amount; i++) {
             add_lane(i);
         }
@@ -82,7 +90,6 @@ void Level::update_players_handle_input(float delta_time) {
             y_retardation = PLAYER_OFFROAD_ACC_RETARDATION;
             player.position.y += PLAYER_OFFROAD_VEL_RETARDATION*delta_time;
         }
-
 
         int dx{0}, dy{0};
         dy += PLAYER_ACCELERATION_Y
@@ -152,8 +159,6 @@ void Level::add_player(Player& player) {
 }
 
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //          Private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,7 +173,16 @@ void Level::spawn_car() {
     this->cars.push_back(Car(sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset)));
 }
 
+void Level::add_lane(int lane_num) {
+    auto x_position = WINDOW_CENTER - (LANE_WIDTH*lane_amount/2) + LANE_WIDTH * lane_num;
+
+    this->lanes.push_back(Lane(sf::Vector2f(x_position, 0)));
+}
+
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
+    if (collided->wrecked) {
+        collider->wrecked = true;
+    }
     float avg_velocity = (collider->velocity.x - collider->velocity.x) / 2;
     float sign = -1;
     if(collider->position.x > collided->position.x) {
@@ -181,12 +195,6 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
         << collided->name << "!" << std::endl;
 }
 
-void Level::add_lane(int lane_num) {
-    auto position = WINDOW_CENTER - (LANE_WIDTH*lane_amount/2) + LANE_WIDTH * lane_num;
-
-    this->lanes.push_back(Lane(sf::Vector2f(position, 0)));
-}
-
 void Level::on_player_collision_with_car(Player* p, Car* c) {
     p->wrecked = true;
     c->wrecked = true;
@@ -194,23 +202,88 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
     std::cout << p->name << " collided with a car!" << std::endl;
 }
 
+sf::Vector2f rotate_vector(sf::Vector2f vec, float angle) {
+    // SFML's angles are clockwise
+    angle = -angle;
+    sf::Vector2f(
+        cos(angle) * vec.x - sin(angle) * vec.y,
+        sin(angle) * vec.x + cos(angle) * vec.y
+    );
+}
+
 CarCollisionResult Level::check_car_collisions() {
     std::vector<sf::Vector2f> points;
 
     for (auto& player : players) {
+        if (player.wrecked) {
+            continue;
+        }
+
         for (auto& car : cars) {
+            auto pos = player.position;
             float px = player.position.x;
             float py = player.position.y;
+
             float cx = car.position.x;
             float cy = car.position.y;
-            float cw = car.width;
-            float ch = car.height;
+            float half_cw = car.width / 2;
+            float half_ch = car.height / 2;
 
-            if (2*std::abs(px - cx) < cw + PLAYER_WIDTH &&
-                2*std::abs(py - cy) < ch + PLAYER_HEIGHT &&
-                !player.wrecked) {
-                return CarCollisionResult{true, points, &player, &car};
+            float half_pw = PLAYER_WIDTH / 2;
+            float half_ph = PLAYER_HEIGHT / 2;
+
+            sf::Vector2f player_ur = pos + rotate_vector(sf::Vector2f(half_pw, -half_ph), player.angle);
+            sf::Vector2f player_ul = pos + rotate_vector(sf::Vector2f(-half_pw, -half_ph), player.angle);
+            sf::Vector2f player_lr = pos + rotate_vector(sf::Vector2f(half_pw, half_ph), player.angle);
+            sf::Vector2f player_ll = pos + rotate_vector(sf::Vector2f(-half_pw, half_ph), player.angle);
+
+            // NOTE: The following checks assume that the player will never rotate so much
+            // that a point on the back of the car will be in front (more than 90 degrees)
+
+            // Separation on y axis
+            if (cy + half_ch < fmin(player_ur.y, player_ul.y) ||
+                cy - half_ch > fmax(player_lr.y, player_ll.y)) {
+                continue;
             }
+
+            // Separation on x axis
+            if (cx + half_cw < fmin(player_ul.x, player_ll.x) ||
+                cx - half_cw > fmax(player_ur.x, player_lr.x)) {
+                continue;
+            }
+
+            // axis1 and 2 are the "local y and x axis" of player
+            sf::Vector2f axis1 = rotate_vector(sf::Vector2f(0, 1), player.angle);
+            sf::Vector2f axis2 = rotate_vector(sf::Vector2f(1, 0), player.angle);
+
+            float proj_pu = axis1.x * player_ur.x + axis1.y * player_ur.y;
+            float proj_pl = axis1.x * player_ll.x + axis1.y * player_ll.y;
+            float proj_cur = axis1.x * (cx + half_cw) + axis1.y * (cy - half_ch);
+            float proj_cul = axis1.x * (cx - half_cw) + axis1.y * (cy - half_ch);
+            float proj_clr = axis1.x * (cx + half_cw) + axis1.y * (cy + half_ch);
+            float proj_cll = axis1.x * (cx - half_cw) + axis1.y * (cy + half_ch);
+
+            // Separation on axis1
+            if (proj_pu < fmin(proj_cur, proj_cul) ||
+                proj_pl > fmax(proj_clr, proj_cll)) {
+                continue;
+            }
+
+            proj_pu = axis2.x * player_ur.x + axis2.y * player_ur.y;
+            proj_pl = axis2.x * player_ll.x + axis2.y * player_ll.y;
+            proj_cur = axis2.x * (cx + half_cw) + axis2.y * (cy - half_ch);
+            proj_cul = axis2.x * (cx - half_cw) + axis2.y * (cy - half_ch);
+            proj_clr = axis2.x * (cx + half_cw) + axis2.y * (cy + half_ch);
+            proj_cll = axis2.x * (cx - half_cw) + axis2.y * (cy + half_ch);
+
+            // Separation on axis2
+            if (proj_pu < fmin(proj_cul, proj_cll) ||
+                proj_pl > fmax(proj_cur, proj_clr)) {
+                continue;
+            }
+
+            // TODO: calculate intersecting points for sparks
+            return CarCollisionResult{true, points, &player, &car};
         }
     }
     return {false, points, nullptr, nullptr};
@@ -221,3 +294,15 @@ bool Level::is_offroad(sf::Vector2f pos, int width) const {
     int right_edge = WINDOW_CENTER + road_width/2;
     return pos.x <= left_edge || pos.x + width >= right_edge;
 }
+
+void Level::check_if_players_within_bounds() {
+    for (auto& player : players) {
+        if (player.position.x + PLAYER_WIDTH < 0 ||
+            player.position.x > WINDOW_WIDTH ||
+            player.position.y + PLAYER_HEIGHT < 0 ||
+            player.position.y > WINDOW_HEIGHT) {
+            player.wrecked = true;
+        }
+    }
+}
+

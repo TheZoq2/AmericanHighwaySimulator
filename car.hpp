@@ -28,6 +28,8 @@ public:
     int height;
     bool wrecked;
 
+    float velocity;
+
 private:
     
     VehicleType type;
