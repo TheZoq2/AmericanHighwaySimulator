@@ -1,5 +1,6 @@
 #include "level.hpp"
 #include <iostream>
+
 #include <algorithm>
 #include <cmath>
 
@@ -42,12 +43,6 @@ void Level::update(float delta_time) {
         spawn_car();
     }
 
-
-    for (auto& player : players) {
-        std::cout << player.name << ": " <<
-            player.position.x << ", " << player.position.y << std::endl;
-    }
-
     CarCollisionResult collision = check_car_collisions();
     if (collision.collision_occurred) {
         on_player_collision_with_car(collision.p, collision.car);
@@ -58,6 +53,13 @@ void Level::update(float delta_time) {
 
 void Level::handle_input(float delta_time) {
     for (auto& player : players) {
+
+        // wrecked cars can't move
+        if (player.wrecked) {
+            player.position.y += ROAD_SPEED*delta_time;
+            continue;
+        }
+
         int dx{0}, dy{0};
         if (player.is_pressed(input::Action::DOWN)) {
             dy += PLAYER_ACCELERATION_Y;
@@ -153,17 +155,18 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1 - avg_velocity;
     collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1 + avg_velocity;
 
-    // TODO do something fun
     std::cout << collider->name << " collided with " 
         << collided->name << "!" << std::endl;
 }
 
-void Level::on_player_collision_with_car(const Player* p, const Car* c) {
-    // TODO do something fun
+void Level::on_player_collision_with_car(Player* p, Car* c) {
+    p->wrecked = true;
+    c->wrecked = true;
+
     std::cout << p->name << " collided with a car!" << std::endl;
 }
 
-CarCollisionResult Level::check_car_collisions() const {
+CarCollisionResult Level::check_car_collisions() {
 
     for (auto& player : players) {
         for (auto& car : cars) {
@@ -175,8 +178,9 @@ CarCollisionResult Level::check_car_collisions() const {
             float ch = car.height;
 
             if (2*std::abs(px - cx) < cw + PLAYER_WIDTH &&
-                2*std::abs(py - cy) < ch + PLAYER_HEIGHT) {
-                return {true, &player, &car};
+                2*std::abs(py - cy) < ch + PLAYER_HEIGHT &&
+                !player.wrecked) {
+                return CarCollisionResult{true, &player, &car};
             }
         }
     }

@@ -21,4 +21,6 @@ const float PLAYER_ACCELERATION_X = 1000;
 const float PLAYER_ACCELERATION_Y = 300;
 const float PLAYER_MAX_VEL_X = 1000;
 
+const float ROAD_SPEED = 400;
+
 #endif

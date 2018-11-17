@@ -11,8 +11,8 @@
 
 struct CarCollisionResult {
     const bool collision_occurred;
-    const Player* p;
-    const Car* car;
+    Player* p;
+    Car* car;
 };
 
 class Level {
@@ -43,11 +43,11 @@ private:
      * Returns a CarCollisionResult containing information about
      * whether a player has collided with a car.
      */
-    CarCollisionResult check_car_collisions() const;
+    CarCollisionResult check_car_collisions();
 
     void on_player_collision_with_other(Player* collider, Player* collided);
 
-    void on_player_collision_with_car(const Player* p, const Car* c);
+    void on_player_collision_with_car(Player* p, Car* c);
 
     int num_lanes;
 
