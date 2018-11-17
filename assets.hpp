@@ -12,7 +12,9 @@ public:
 
     void draw(sf::RenderTarget* target, sf::Vector2f position);
     void draw(sf::RenderTarget* target, sf::Vector2f position, float angle);
+    void draw(sf::RenderTarget* target, sf::Vector2f position, float angle, sf::Vector2f scale);
     void draw(sf::RenderTarget* target, sf::Vector2f position, float angle, sf::Color color);
+    void draw(sf::RenderTarget* target, sf::Vector2f position, float angle, sf::Color color, sf::Vector2f scale);
 
     void set_origin(float x, float y);
 
