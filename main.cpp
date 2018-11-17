@@ -1,4 +1,8 @@
 #include <SFML/Window.hpp>
+
+#include <chrono>
+#include <iostream>
+
 #include "level.hpp"
 #include "assets.hpp"
 #include "consts.hpp"
@@ -27,8 +31,10 @@ int main() {
     Player pappa{"Din pappa", ph, sf::Vector2f{500, 0}};
     level.add_player(pappa);
 
+    typedef std::chrono::duration<float> FloatSeconds;
+    float next_time_step = 0;
     while(window.isOpen()) {
-
+        auto frame_start = std::chrono::steady_clock::now().time_since_epoch();
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -36,14 +42,20 @@ int main() {
             }
         }
 
-        level.update();
+        level.update(next_time_step);
 
-// TODO implement timer based movement
+
         window.clear(sf::Color::Black);
 
         level.draw(&window, assets);
 
         window.display();
+
+        auto frame_end = std::chrono::steady_clock::now().time_since_epoch();
+        auto delta = std::chrono::duration_cast<FloatSeconds>(frame_end - frame_start);
+        next_time_step = delta.count();
+
+        std::cout << next_time_step << std::endl;
     }
 
     return 0;

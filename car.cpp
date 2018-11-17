@@ -1,5 +1,8 @@
 #include "car.hpp"
 
+#include "consts.hpp"
+
+Car::Car(sf::Vector2f position) : Car(VehicleType::CAR, position){}
 Car::Car(VehicleType type, sf::Vector2f position) {
     this->type = type;
     this->position = position;
@@ -10,6 +13,6 @@ void Car::draw(sf::RenderTarget* target, Assets& assets) const {
 }
 
 
-void Car::update() {
-    this->position.y += 0.5;
+void Car::update(float delta) {
+    this->position.y += delta * CAR_SPEED;
 }

@@ -17,13 +17,14 @@ public:
     ~Level();
 
     void draw(sf::RenderTarget* target, Assets& assets) const;
-    void update();
+    void update(float delta);
 
     void add_player(Player& player);
 
 private:
 
     void handle_input();
+    void spawn_car();
 
     /*
      * Checks if Player p can be moved to new_pos. If it can,
@@ -39,6 +40,9 @@ private:
     std::vector<Car> cars;
     std::vector<Player> players;
 
+    int lane_amount = 6;
+
+    int road_width;
 };
 
 #endif /* ifndef LEVEL_H */
