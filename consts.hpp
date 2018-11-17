@@ -8,7 +8,7 @@ const int WINDOW_CENTER = WINDOW_WIDTH / 2;
 
 
 // Game parameters
-const int CAR_AMOUNT = 10;
+const int CAR_AMOUNT = 14;
 const int LANE_WIDTH = 200;
 const int CAR_SPAWN_Y = -300;
 const int CAR_DESPAWN_Y = WINDOW_HEIGHT - CAR_SPAWN_Y;

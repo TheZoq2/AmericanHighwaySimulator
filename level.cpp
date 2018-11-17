@@ -179,7 +179,7 @@ void Level::add_player(Player& player) {
 
 void Level::spawn_car() {
     auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
-    if(random() % 100 > 30) {
+    if(random() % 100 > 50) {
         auto lane = random() % lane_amount;
         // +0.5 to put the car in the center of the lane rather than on the side
         auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
@@ -191,10 +191,10 @@ void Level::spawn_car() {
         auto position = (random() % range) - range/2;
 
         if(position > 0) {
-            position += road_width;
+            position += road_width / 2;
         }
         else {
-            position += road_width;
+            position -= road_width / 2;
         }
 
         position += WINDOW_CENTER;
@@ -254,7 +254,6 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
 }
 
 CarCollisionResult Level::check_car_collisions() {
-
     for (auto& player : players) {
         for (auto& car : cars) {
             float px = player.position.x;

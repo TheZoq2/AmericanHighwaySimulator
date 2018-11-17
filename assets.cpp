@@ -36,7 +36,12 @@ void Asset::set_origin(float x, float y) {
 
 
 Assets::Assets() :
-    generic_car("../resources/car.png"),
+    generic_car{
+        Asset("../resources/car.png"),
+        Asset("../resources/car_hit.png"),
+        Asset("../resources/car_damaged.png"),
+        Asset("../resources/car_broken_down.png")
+    },
     lane("../resources/lane.png"),
     powerup("../resources/powerup.png"),
     sleep("../resources/sleep.png"),

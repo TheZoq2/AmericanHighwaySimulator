@@ -27,7 +27,11 @@ void Car::draw(sf::RenderTarget* target, Assets& assets) const {
         assets.rock.draw(target, this->position);
     }
     else {
-        assets.generic_car.draw(target, this->position);
+        auto asset = assets.generic_car[0];
+        if(wrecked) {
+            asset = assets.generic_car[3];
+        }
+        asset.draw(target, this->position);
     }
 }
 

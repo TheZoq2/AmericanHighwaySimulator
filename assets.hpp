@@ -24,7 +24,7 @@ class Assets {
 public:
     Assets();
 
-    Asset generic_car;
+    Asset generic_car[4];
     Asset lane;
     Asset powerup;
     Asset sleep;
