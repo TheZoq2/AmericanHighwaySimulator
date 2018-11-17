@@ -92,7 +92,7 @@ void Level::update_players_handle_input(float delta_time) {
         }
 
         int dx{0}, dy{0};
-        dy += PLAYER_ACCELERATION_Y
+        dy += PLAYER_ACCELERATION_Y_DOWN
             * player.input_handler->get_value(input::Action::DOWN)
             * (1/y_retardation);
         dy -= PLAYER_ACCELERATION_Y
