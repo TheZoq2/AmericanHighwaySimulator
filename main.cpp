@@ -18,12 +18,15 @@ int main() {
 
     sf::Sprite bg_sprite;
     bg_sprite.setTexture(bg_texture);
-    bg_sprite.setTextureRect(sf::IntRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT));
+    bg_sprite.setTextureRect(sf::IntRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT+100));
+    bg_sprite.setOrigin(sf::Vector2f(0,0));
 
     sf::Sprite bg_sprite_second;
     bg_sprite_second.setTexture(bg_texture);
-    bg_sprite_second.setTextureRect(sf::IntRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT));
-    bg_sprite_second.setPosition(sf::Vector2f(0, -WINDOW_HEIGHT));
+    bg_sprite_second.setTextureRect(sf::IntRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT+100));
+    bg_sprite_second.setPosition(sf::Vector2f(0, -WINDOW_HEIGHT-10));
+    bg_sprite_second.setOrigin(sf::Vector2f(0,0));
+
     window.setPosition(sf::Vector2i(0, 0));
 
     srand(time(NULL));
@@ -37,7 +40,6 @@ int main() {
     float next_time_step = 0;
 
     while(window.isOpen()) {
-
         auto frame_start = std::chrono::steady_clock::now().time_since_epoch();
         sf::Event event;
         while (window.pollEvent(event)) {
