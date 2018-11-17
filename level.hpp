@@ -6,6 +6,7 @@
 #include "car.hpp"
 #include "player.hpp"
 #include "input.hpp"
+#include "lane.hpp"
 #include "consts.hpp"
 
 
@@ -31,6 +32,7 @@ private:
 
     void update_players_handle_input(float delta_time);
     void spawn_car();
+    void add_lane(int lane_num);
 
     bool is_offroad(sf::Vector2f pos, int width) const;
 
@@ -57,8 +59,9 @@ private:
 
     std::vector<Car> cars;
     std::vector<Player> players;
+    std::vector<Lane> lanes;
 
-    int lane_amount = 6;
+    int lane_amount = 7;
 
     int road_width;
 };
