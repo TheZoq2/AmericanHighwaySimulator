@@ -6,6 +6,7 @@ Player::Player(std::string name, input::InputHandler* input_handler,
         sf::Vector2f start_position) :
     name(name), position(start_position) {
         this->just_collided_with = nullptr;
+        this->wrecked = false;
         this->input_handler = input_handler;
     }
 

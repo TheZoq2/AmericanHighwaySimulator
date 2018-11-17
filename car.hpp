@@ -26,11 +26,11 @@ public:
 
     int width;
     int height;
+    bool wrecked;
 
 private:
     
     VehicleType type;
-
 
 };
 

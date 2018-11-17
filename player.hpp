@@ -20,6 +20,7 @@ public:
     sf::Vector2f position;
     Player* just_collided_with;
     sf::Vector2f velocity;
+    bool wrecked;
 
     input::InputHandler* input_handler;
 private:
