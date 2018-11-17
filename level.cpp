@@ -176,7 +176,7 @@ void Level::spawn_car() {
 void Level::add_lane(int lane_num) {
     auto x_position = WINDOW_CENTER - (LANE_WIDTH*lane_amount/2) + LANE_WIDTH * lane_num;
 
-    this->lanes.push_back(Lane(sf::Vector2f(x_position, 100)));
+    this->lanes.push_back(Lane(sf::Vector2f(x_position, 0)));
 }
 
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
