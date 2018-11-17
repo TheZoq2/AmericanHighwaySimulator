@@ -2,7 +2,6 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-#include "consts.hpp"
 
 Level::Level(int num_lanes) {
     this->num_lanes = num_lanes;
@@ -44,7 +43,7 @@ void Level::update(float delta_time) {
     }
 
 
-    handle_input();
+    handle_input(delta_time);
 
     for (auto& player : players) {
         std::cout << player.name << ": " <<
@@ -52,27 +51,31 @@ void Level::update(float delta_time) {
     }
 }
 
-void Level::handle_input() {
+void Level::handle_input(float delta_time) {
     for (auto& player : players) {
         int dx{0}, dy{0};
         if (player.is_pressed(input::Action::DOWN)) {
-            dy += PLAYER_SPEED;
+            dy += PLAYER_ACCELERATION;
         }
         if (player.is_pressed(input::Action::UP)) {
-            dy -= PLAYER_SPEED;
+            dy -= PLAYER_ACCELERATION;
         }
         if (player.is_pressed(input::Action::LEFT)) {
-            dx -= PLAYER_SPEED;
+            dx -= PLAYER_ACCELERATION;
         }
         if (player.is_pressed(input::Action::RIGHT)) {
-            dx += PLAYER_SPEED;
+            dx += PLAYER_ACCELERATION;
         }
 
-        sf::Vector2f dxdy(dx, dy);
-        sf::Vector2f new_pos = player.position + dxdy;
+        sf::Vector2f acceleration(dx, dy);
+        acceleration *= delta_time;
+
+        player.velocity += acceleration;
+
+        sf::Vector2f new_pos = player.position + player.velocity * delta_time;
         Player* collided = get_colliding_player(&player, new_pos);
         if (collided == nullptr) {
-            player.position += dxdy;
+            player.position += player.velocity * delta_time;
         } else {
 
             // this is to prevent on_player_collision to be fired

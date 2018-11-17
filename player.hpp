@@ -3,6 +3,7 @@
 
 #include "input.hpp"
 #include "assets.hpp"
+#include "consts.hpp"
 #include <string>
 #include <SFML/Graphics.hpp>
 
@@ -20,6 +21,7 @@ public:
     std::string name;
     sf::Vector2f position;
     Player* just_collided_with;
+    sf::Vector2f velocity;
 
 private:
 
