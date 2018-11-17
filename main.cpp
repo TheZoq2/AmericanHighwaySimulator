@@ -28,7 +28,7 @@ int main() {
     Player mamma{"Din mamma", mh, sf::Vector2f{0, 0}};
     level.add_player(mamma);
 
-    Player pappa{"Din pappa", ph, sf::Vector2f{0, 0}};
+    Player pappa{"Din pappa", ph, sf::Vector2f{500, 0}};
     level.add_player(pappa);
 
     typedef std::chrono::duration<float> FloatSeconds;
