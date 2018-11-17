@@ -9,6 +9,11 @@ Level::Level(int num_lanes) {
 
     this->road_width = lane_amount * LANE_WIDTH;
 
+    sf::Texture bg_texture;
+    bg_texture.loadFromFile("../resources/grass.png");
+
+    sf::Sprite bg_sprite;
+    bg_sprite.setTexture(bg_texture);
 }
 
 Level::~Level() { }
@@ -259,6 +264,8 @@ CarCollisionResult Level::check_car_collisions() {
     }
     return {false, nullptr, nullptr};
 }
+
+
 
 bool Level::is_offroad(sf::Vector2f pos, int width) const {
     int left_edge = WINDOW_CENTER - road_width/2;
