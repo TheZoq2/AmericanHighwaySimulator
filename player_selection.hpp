@@ -24,6 +24,8 @@ public:
     int spawn_x = 200;
 
 private:
+    void add_player(input::InputHandler* handler);
+
     input::KeyboardInputHandler* left;
     input::KeyboardInputHandler* right;
     sf::Texture background_texture;

@@ -27,27 +27,21 @@ void PlayerSelection::draw(sf::RenderTarget* target) {
 void PlayerSelection::run() {
     if (left != nullptr && left->get_value(input::Action::UP)) {
         std::cout << "player 1 joined" << std::endl;
-        this->players.push_back(Player("Player", left, sf::Vector2f(spawn_x, 400)));
+        add_player(left);
         left = nullptr;
-        spawn_x += 300;
     }
     if (right != nullptr && right->get_value(input::Action::UP)) {
         std::cout << "player 2 joined" << std::endl;
-        this->players.push_back(Player("Player", right, sf::Vector2f(spawn_x, 400)));
+        add_player(right);
         right = nullptr;
-        spawn_x += 300;
     }
 
     for(int i = 0; i < 8; ++i) {
         if(sf::Joystick::isConnected(i)) {
             if(sf::Joystick::isButtonPressed(i, 7)) {
                 if(used_controllers.count(i) == 0) {
-                    auto jh = new input::ControllerInputHandler(i);
-                    this->players.push_back(Player(
-                        "Player",
-                        jh,
-                        sf::Vector2f(spawn_x, 400)
-                    ));
+                    auto handler = new input::ControllerInputHandler(i);
+                    add_player(handler);
                     used_controllers.insert(i);
                 }
             }
@@ -58,3 +52,14 @@ void PlayerSelection::run() {
         done = true;
     }
 }
+
+
+void PlayerSelection::add_player(input::InputHandler* handler) {
+    this->players.push_back(Player(
+        "Player",
+        handler,
+        sf::Vector2f(spawn_x, 400)
+    ));
+    spawn_x += 300;
+}
+
