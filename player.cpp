@@ -27,6 +27,12 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         visual_angle,
         sf::Color(r, g, b)
     );
+
+    if (this->powerup != nullptr) {
+        sf::Vector2f powerup_pos = this->position + 
+            sf::Vector2f{0, PLAYER_HEIGHT*0.7};
+        this->powerup->draw_mini(target, assets, powerup_pos);
+    }
 }
 
 void Player::set_powerup(PowerUp* p) {

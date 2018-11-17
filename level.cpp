@@ -82,6 +82,9 @@ void Level::update(float delta_time) {
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        if (player.powerup != nullptr) {
+            player.powerup->angle += POWERUP_ANGLE_SPEED*delta_time;
+        }
 
         // wrecked cars can't move
         if (player.wrecked) {
@@ -264,6 +267,7 @@ void Level::check_if_players_within_bounds() {
         }
     }
 }
+
 
 void Level::spawn_powerup() {
     auto lane = random() % lane_amount;

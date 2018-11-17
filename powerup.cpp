@@ -1,6 +1,25 @@
 #include "powerup.hpp"
 
 void PowerUp::draw(sf::RenderTarget* target, Assets& assets) const {
-    assets.powerup.draw(target, this->position, this->angle);
+    switch (this->type) {
+        case PowerUpType::SLEEPY:
+            assets.sleep.draw(target, this->position, this->angle);
+            break;
+        case PowerUpType::TRANSPARENCY:
+            assets.transparency.draw(target, this->position, this->angle);
+            break;
+    }
+}
+
+void PowerUp::draw_mini(sf::RenderTarget* target, Assets& assets,
+        sf::Vector2f pos) const {
+    switch (this->type) {
+        case PowerUpType::SLEEPY:
+            assets.sleep.draw(target, pos, this->angle);
+            break;
+        case PowerUpType::TRANSPARENCY:
+            assets.transparency.draw(target, pos, this->angle);
+            break;
+    }
 }
 

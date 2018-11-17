@@ -27,5 +27,7 @@ public:
     Asset generic_car;
     Asset lane;
     Asset powerup;
+    Asset sleep;
+    Asset transparency;
 };
 #endif
