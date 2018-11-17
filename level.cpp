@@ -8,12 +8,16 @@ Level::Level(int num_lanes) {
     this->num_lanes = num_lanes;
 
     this->road_width = lane_amount * LANE_WIDTH;
+
 }
 
 Level::~Level() { }
 
-
 void Level::draw(sf::RenderTarget* target, Assets& assets) const {
+    for (auto& lane : lanes) {
+        lane.draw(target, assets);
+    }
+
     for (auto& car: cars) {
         car.draw(target, assets);
     }
@@ -21,10 +25,16 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
     for (auto& player: players) {
         player.draw(target, assets);
     }
+
 }
 
 
 void Level::update(float delta_time) {
+    // Update lanes
+    for (auto& lane : lanes) {
+        lane.update(delta_time);
+    }
+
     // Update cars
     for(auto& car: cars) {
         car.update(delta_time);
@@ -41,6 +51,13 @@ void Level::update(float delta_time) {
     // Spawn new cars
     while(cars.size() < CAR_AMOUNT) {
         spawn_car();
+    }
+
+    // Add new lanes
+    if (lanes.size() < lane_amount * 2) {
+        for (int i = 0; i < lane_amount; i++) {
+            add_lane(i);
+        }
     }
 
 
@@ -79,7 +96,7 @@ void Level::handle_input() {
             // more than once per collision
             if (player.just_collided_with != collided) {
                 on_player_collision_with_other(&player, collided);
-            } 
+            }
         }
         // this is to prevent on_player_collision to be fired
         // more than once per collision
@@ -94,7 +111,7 @@ Player* Level::get_colliding_player(const Player* p, sf::Vector2f new_pos) {
         // we don't care if we collide with ourselves
         if (other != p) {
             sf::Vector2f pos = other->position;
-            
+
             float new_x = new_pos.x;
             float other_x = pos.x;
             float new_y = new_pos.y;
@@ -132,7 +149,12 @@ void Level::spawn_car() {
 
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     // TODO do something fun
-    std::cout << collider->name << " collided with " 
+    std::cout << collider->name << " collided with "
         << collided->name << "!" << std::endl;
 }
 
+void Level::add_lane(int lane_num) {
+    auto position = WINDOW_CENTER - (LANE_WIDTH*lane_amount/2) + LANE_WIDTH * lane_num;
+
+    this->lanes.push_back(Lane(sf::Vector2f(position, 0)));
+}
