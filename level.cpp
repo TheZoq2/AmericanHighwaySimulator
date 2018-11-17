@@ -195,6 +195,7 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
 }
 
 CarCollisionResult Level::check_car_collisions() {
+    std::vector<sf::Vector2f> points;
 
     for (auto& player : players) {
         for (auto& car : cars) {
@@ -208,11 +209,11 @@ CarCollisionResult Level::check_car_collisions() {
             if (2*std::abs(px - cx) < cw + PLAYER_WIDTH &&
                 2*std::abs(py - cy) < ch + PLAYER_HEIGHT &&
                 !player.wrecked) {
-                return CarCollisionResult{true, &player, &car};
+                return CarCollisionResult{true, points, &player, &car};
             }
         }
     }
-    return {false, nullptr, nullptr};
+    return {false, points, nullptr, nullptr};
 }
 
 bool Level::is_offroad(sf::Vector2f pos, int width) const {
