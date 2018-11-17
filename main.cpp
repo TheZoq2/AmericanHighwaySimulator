@@ -11,6 +11,7 @@
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "American highway simulator");
+    window.setPosition(sf::Vector2i(0, 0));
 
     srand(time(NULL));
 
