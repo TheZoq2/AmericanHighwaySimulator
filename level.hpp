@@ -25,6 +25,15 @@ private:
 
     void handle_input();
 
+    /*
+     * Checks if Player p can be moved to new_pos. If it can,
+     * it returns a nullptr, otherwise it returns a pointer to the player
+     * it collides with.
+     */
+    Player* get_colliding_player(const Player* p, sf::Vector2f new_pos);
+
+    void on_player_collision_with_other(Player* collider, Player* collided);
+
     int num_lanes;
 
     std::vector<Car> cars;

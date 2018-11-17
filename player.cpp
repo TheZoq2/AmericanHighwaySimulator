@@ -8,4 +8,7 @@ bool Player::is_pressed(const input::Action ac) {
     return this->input_handler.is_pressed(ac);
 }
 
+void Player::draw(sf::RenderTarget* target, Assets& assets) const {
+    assets.generic_car.draw(target, this->position);
+}
 

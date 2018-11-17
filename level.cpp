@@ -1,9 +1,8 @@
 #include "level.hpp"
 #include <iostream>
-
-#include "consts.hpp"
-
 #include <algorithm>
+#include <cmath>
+#include "consts.hpp"
 
 Level::Level(int num_lanes) {
     this->num_lanes = num_lanes;
@@ -15,14 +14,18 @@ Level::~Level() { }
 
 
 void Level::draw(sf::RenderTarget* target, Assets& assets) const {
-    for(auto car: cars) {
+    for (auto& car: cars) {
         car.draw(target, assets);
+    }
+
+    for (auto& player: players) {
+        player.draw(target, assets);
     }
 }
 
 
 void Level::update() {
-    for(auto& car: cars) {
+    for (auto& car: cars) {
         car.update();
     }
 
@@ -44,19 +47,55 @@ void Level::handle_input() {
     for (auto& player : players) {
         int dx{0}, dy{0};
         if (player.is_pressed(input::Action::DOWN)) {
-            dy -= PLAYER_SPEED;
-        } else if (player.is_pressed(input::Action::UP)) {
             dy += PLAYER_SPEED;
         }
+        if (player.is_pressed(input::Action::UP)) {
+            dy -= PLAYER_SPEED;
+        }
         if (player.is_pressed(input::Action::LEFT)) {
-            dx += PLAYER_SPEED;
-        } else if (player.is_pressed(input::Action::RIGHT)) {
             dx -= PLAYER_SPEED;
+        }
+        if (player.is_pressed(input::Action::RIGHT)) {
+            dx += PLAYER_SPEED;
         }
 
         sf::Vector2f dxdy(dx, dy);
-        player.position += dxdy;
+        sf::Vector2f new_pos = player.position + dxdy;
+        Player* collided = get_colliding_player(&player, new_pos);
+        if (collided == nullptr) {
+            player.position += dxdy;
+        } else {
+            on_player_collision_with_other(&player, collided);
+        }
     }
+}
+
+Player* Level::get_colliding_player(const Player* p, sf::Vector2f new_pos) {
+    for (size_t i{0}; i < players.size(); ++i) {
+        Player* other = &players[i];
+
+        // we don't care if we collide with ourselves
+        if (other != p) {
+            sf::Vector2f pos = other->position;
+            
+            float new_x = new_pos.x;
+            float other_x = pos.x;
+            float new_y = new_pos.y;
+            float other_y = pos.y;
+
+            if (std::abs(new_x - other_x) < PLAYER_WIDTH &&
+                std::abs(new_y - other_y) < PLAYER_HEIGHT) {
+                return other;
+            }
+        }
+    }
+    return nullptr;
+}
+
+void Level::on_player_collision_with_other(Player* collider, Player* collided) {
+    // TODO do something fun
+    std::cout << collider->name << " collided with " 
+        << collided->name << "!" << std::endl;
 }
 
 void Level::add_player(Player& player) {
