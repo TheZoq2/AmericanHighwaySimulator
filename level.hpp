@@ -58,6 +58,8 @@ private:
 
     void check_if_players_within_bounds();
 
+    void update_player_status(sf::RenderTarget* target, Assets& assets);
+
     int num_lanes;
 
     std::vector<Car> cars;
