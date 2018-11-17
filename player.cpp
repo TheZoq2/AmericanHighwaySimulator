@@ -12,6 +12,7 @@ Player::Player(
     this->input_handler = input_handler;
     this->wrecked = false;
     this->powerup = nullptr;
+    this->persistent_acceleration = sf::Vector2f(0, 0);
 
     r = random() % 255;
     g = random() % 255;
