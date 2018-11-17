@@ -23,6 +23,7 @@ int main() {
     bg_sprite_second.setTexture(bg_texture);
     bg_sprite_second.setTextureRect(sf::IntRect(0,0,WINDOW_WIDTH, WINDOW_HEIGHT));
     bg_sprite_second.setPosition(sf::Vector2f(0, -WINDOW_HEIGHT));
+    window.setPosition(sf::Vector2i(0, 0));
 
     srand(time(NULL));
 
@@ -87,9 +88,6 @@ int main() {
 
             level.draw(&window, assets);
         }
-
-
-
 
         window.display();
 

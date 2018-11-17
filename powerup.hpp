@@ -16,6 +16,8 @@ struct PowerUp {
     float angle;
 
     void draw(sf::RenderTarget* target, Assets& assets) const;
+    void draw_mini(sf::RenderTarget* target, Assets& assets,
+            sf::Vector2f pos) const;
 
 };
 

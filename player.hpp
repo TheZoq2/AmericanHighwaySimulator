@@ -23,11 +23,17 @@ public:
     sf::Vector2f position;
     Player* just_collided_with;
     sf::Vector2f velocity;
+
+    float health = 100;
+    sf::Vector2f persistent_acceleration;
+
     bool wrecked;
 
     PowerUp* powerup;
 
     input::InputHandler* input_handler;
+
+    float invuln_time = 0;
 
 private:
     float r, g, b;

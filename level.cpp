@@ -87,6 +87,9 @@ void Level::update(float delta_time) {
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        if (player.powerup != nullptr) {
+            player.powerup->angle += POWERUP_ANGLE_SPEED*delta_time;
+        }
 
         // wrecked cars can't move
         if (player.wrecked) {
@@ -113,6 +116,7 @@ void Level::update_players_handle_input(float delta_time) {
             * player.input_handler->get_value(input::Action::RIGHT);
 
         sf::Vector2f acceleration(dx, dy);
+        acceleration += player.persistent_acceleration;
         acceleration *= delta_time;
 
         player.velocity += acceleration;
@@ -206,10 +210,22 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c) {
-    p->wrecked = true;
+    p->position -= p->velocity;
+    p->persistent_acceleration.x +=
+        (random() * COLLISION_MAX_BREAKAGE) - COLLISION_MAX_BREAKAGE / 2;
+    p->health -= COLLISION_DAMAGE;
+
+    if(p->health < 0) {
+        // p->wrecked = true;
+    }
+    // p->wrecked = true;
     c->wrecked = true;
 
-    std::cout << p->name << " collided with a car!" << std::endl;
+    float sign = -1;
+    if(p->position.x > c->position.x) {
+        sign = 1;
+    }
+    p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
 }
 
 CarCollisionResult Level::check_car_collisions() {
@@ -251,6 +267,7 @@ void Level::check_if_players_within_bounds() {
         }
     }
 }
+
 
 void Level::spawn_powerup() {
     auto lane = random() % lane_amount;
