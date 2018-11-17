@@ -11,6 +11,7 @@
 
 struct CarCollisionResult {
     const bool collision_occurred;
+    std::vector<sf::Vector2f> intersecting_points;
     Player* p;
     Car* car;
 };

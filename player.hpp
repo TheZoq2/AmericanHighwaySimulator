@@ -21,6 +21,7 @@ public:
     Player* just_collided_with;
     sf::Vector2f velocity;
     bool wrecked;
+    float angle;
 
     input::InputHandler* input_handler;
 private:
