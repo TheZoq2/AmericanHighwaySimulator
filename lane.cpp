@@ -6,9 +6,10 @@ Lane::Lane(sf::Vector2f position) {
 }
 
 void Lane::update(float delta) {
-    this->position.y += delta;
+    this->position.y += delta * ROAD_SPEED;
 }
 
 void Lane::draw(sf::RenderTarget* target, Assets& assets) const {
     assets.lane.draw(target, this->position);
+    assets.lane.draw(target, this->position + sf::Vector2f(0, -WINDOW_HEIGHT));
 }

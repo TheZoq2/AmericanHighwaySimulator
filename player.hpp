@@ -30,6 +30,7 @@ public:
     input::InputHandler* input_handler;
 
 private:
+    float r, g, b;
 
 };
 
