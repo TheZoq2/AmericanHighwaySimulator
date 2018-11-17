@@ -44,7 +44,6 @@ int main() {
 
         level.update(next_time_step);
 
-
         window.clear(sf::Color::Black);
 
         level.draw(&window, assets);

@@ -8,8 +8,6 @@
 Level::Level(int num_lanes) {
     this->num_lanes = num_lanes;
 
-    this->cars.push_back(Car(VehicleType::CAR, sf::Vector2f(100, 100)));
-
     this->road_width = lane_amount * LANE_WIDTH;
 }
 
@@ -38,10 +36,8 @@ void Level::update(float delta_time) {
     this->cars = new_cars;
 
     // Spawn new cars
-    if(cars.size() < CAR_AMOUNT) {
-        if(random() % 100 > CAR_SPAWN_PROBABILITY ) {
-            spawn_car();
-        }
+    while(cars.size() < CAR_AMOUNT) {
+        spawn_car();
     }
 
 
@@ -88,5 +84,7 @@ void Level::spawn_car() {
     // +0.5 to put the car in the center of the lane rather than on the side
     auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
 
-    this->cars.push_back(Car(sf::Vector2f(position, CAR_SPAWN_Y)));
+    auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
+
+    this->cars.push_back(Car(sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset)));
 }
