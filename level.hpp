@@ -71,17 +71,17 @@ private:
 
     int road_width;
 
-
     /////////////////////////////////////////
     // Powerups
     /////////////////////////////////////////
     
+    void fire_player_powerup(Player* p);
     bool powerup_collides_with_player(PowerUp* pu, Player* p) const;
     void update_and_spawn_powerups(float delta_time);
     void draw_powerups(sf::RenderTarget* target, Assets& assets);
     
-    void activate_sleepy_powerup();
-    void activate_transparency_powerup();
+    void activate_sleepy_powerup(Player* p);
+    void activate_transparency_powerup(Player* p);
 };
 
 #endif /* ifndef LEVEL_H */

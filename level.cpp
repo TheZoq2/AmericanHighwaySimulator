@@ -81,8 +81,8 @@ void Level::update(float delta_time) {
         on_player_collision_with_car(collision.p, collision.car);
     }
 
-    update_players_handle_input(delta_time);
     update_and_spawn_powerups(delta_time);
+    update_players_handle_input(delta_time);
 }
 
 void Level::update_players_handle_input(float delta_time) {
@@ -95,6 +95,11 @@ void Level::update_players_handle_input(float delta_time) {
         if (player.wrecked) {
             player.position.y += ROAD_SPEED*delta_time;
             continue;
+        }
+
+        // handle transparency
+        if (player.transparency_time > 0) {
+            player.transparency_time--;
         }
 
         float y_retardation = 1.;
@@ -142,6 +147,11 @@ void Level::update_players_handle_input(float delta_time) {
         // this is to prevent on_player_collision to be fired
         // more than once per collision
         player.just_collided_with = collided;
+
+        if (player.input_handler->get_value(input::Action::FIRE) &&
+            player.powerup != nullptr) {
+            fire_player_powerup(&player);
+        }
     }
 }
 
@@ -248,7 +258,6 @@ CarCollisionResult Level::check_car_collisions() {
                 !player.wrecked) {
                 return CarCollisionResult{true, &player, &car};
             }
-
         }
 
         player.collidee = nullptr;
@@ -327,11 +336,25 @@ bool Level::powerup_collides_with_player(PowerUp* pu, Player* p) const {
            std::abs(p->position.y - pu->position.y) < POWERUP_HEIGHT;
 }
 
-void Level::activate_sleepy_powerup() {
+void Level::fire_player_powerup(Player* p) {
+    switch (p->powerup->type) {
+        case PowerUpType::SLEEPY:
+            activate_sleepy_powerup(p);
+            break;
+        case PowerUpType::TRANSPARENCY:
+            activate_transparency_powerup(p);
+            break;
+    }
+    delete p->powerup;
+    p->powerup = nullptr;
+}
+
+void Level::activate_sleepy_powerup(Player* p) {
     std::cout << "Sleepy!" << std::endl;
 }
 
-void Level::activate_transparency_powerup() {
+void Level::activate_transparency_powerup(Player* p) {
+    p->transparency_time = TRANSPARENCY_TIME;
     std::cout << "Transparency!" << std::endl;
 }
 

@@ -18,14 +18,24 @@ Asset::Asset(std::string path) {
 void Asset::draw(sf::RenderTarget* target, sf::Vector2f position) {
     draw(target, position, 0);
 }
+
 void Asset::draw(sf::RenderTarget* target, sf::Vector2f position, float angle) {
     draw(target, position, angle, sf::Color(255, 255, 255, 255));
 }
 
+void Asset::draw(sf::RenderTarget* target, sf::Vector2f position, float angle, sf::Vector2f scale) {
+    draw(target, position, angle, sf::Color(255, 255, 255, 255), scale);
+}
+
 void Asset::draw(sf::RenderTarget* target, sf::Vector2f position, float angle, sf::Color color) {
+    draw(target, position, angle, color, sf::Vector2f{1, 1});
+}
+
+void Asset::draw(sf::RenderTarget* target, sf::Vector2f position, float angle, sf::Color color, sf::Vector2f scale) {
     sprite.setColor(color);
     sprite.setPosition(position);
     sprite.setRotation(angle);
+    sprite.setScale(scale.x, scale.y);
     target->draw(sprite);
 }
 
