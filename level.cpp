@@ -1,8 +1,8 @@
 #include "level.hpp"
 #include <iostream>
+
 #include <algorithm>
 #include <cmath>
-#include "consts.hpp"
 
 Level::Level(int num_lanes) {
     this->num_lanes = num_lanes;
@@ -60,38 +60,59 @@ void Level::update(float delta_time) {
         }
     }
 
-
-    handle_input();
-
-    for (auto& player : players) {
-        std::cout << player.name << ": " <<
-            player.position.x << ", " << player.position.y << std::endl;
+    CarCollisionResult collision = check_car_collisions();
+    if (collision.collision_occurred) {
+        on_player_collision_with_car(collision.p, collision.car);
     }
+
+    update_players_handle_input(delta_time);
 }
 
-void Level::handle_input() {
+void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
-        int dx{0}, dy{0};
-        if (player.is_pressed(input::Action::DOWN)) {
-            dy += PLAYER_SPEED;
-        }
-        if (player.is_pressed(input::Action::UP)) {
-            dy -= PLAYER_SPEED;
-        }
-        if (player.is_pressed(input::Action::LEFT)) {
-            dx -= PLAYER_SPEED;
-        }
-        if (player.is_pressed(input::Action::RIGHT)) {
-            dx += PLAYER_SPEED;
+
+        // wrecked cars can't move
+        if (player.wrecked) {
+            player.position.y += ROAD_SPEED*delta_time;
+            continue;
         }
 
-        sf::Vector2f dxdy(dx, dy);
-        sf::Vector2f new_pos = player.position + dxdy;
+        float y_retardation = 1.;
+        if (is_offroad(player.position, PLAYER_WIDTH)) {
+            y_retardation = PLAYER_OFFROAD_ACC_RETARDATION;
+            player.position.y += PLAYER_OFFROAD_VEL_RETARDATION*delta_time;
+        }
+
+
+        int dx{0}, dy{0};
+        dy += PLAYER_ACCELERATION_Y
+            * player.input_handler->get_value(input::Action::DOWN)
+            * (1/y_retardation);
+        dy -= PLAYER_ACCELERATION_Y
+            * player.input_handler->get_value(input::Action::UP)
+            * y_retardation;
+        dx -= PLAYER_ACCELERATION_X
+            * player.input_handler->get_value(input::Action::LEFT);
+        dx += PLAYER_ACCELERATION_X
+            * player.input_handler->get_value(input::Action::RIGHT);
+
+        sf::Vector2f acceleration(dx, dy);
+        acceleration *= delta_time;
+
+        player.velocity += acceleration;
+
+        if (player.velocity.x > PLAYER_MAX_VEL_X) {
+            player.velocity.x = PLAYER_MAX_VEL_X;
+        }
+        if (-player.velocity.x < -PLAYER_MAX_VEL_X) {
+            player.velocity.x = PLAYER_MAX_VEL_X;
+        }
+
+        sf::Vector2f new_pos = player.position + player.velocity * delta_time;
         Player* collided = get_colliding_player(&player, new_pos);
         if (collided == nullptr) {
-            player.position += dxdy;
+            player.position += player.velocity * delta_time;
         } else {
-
             // this is to prevent on_player_collision to be fired
             // more than once per collision
             if (player.just_collided_with != collided) {
@@ -148,8 +169,15 @@ void Level::spawn_car() {
 }
 
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
-    // TODO do something fun
-    std::cout << collider->name << " collided with "
+    float avg_velocity = (collider->velocity.x - collider->velocity.x) / 2;
+    float sign = -1;
+    if(collider->position.x > collided->position.x) {
+        sign = 1;
+    }
+    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1 - avg_velocity;
+    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1 + avg_velocity;
+
+    std::cout << collider->name << " collided with " 
         << collided->name << "!" << std::endl;
 }
 
@@ -157,4 +185,38 @@ void Level::add_lane(int lane_num) {
     auto position = WINDOW_CENTER - (LANE_WIDTH*lane_amount/2) + LANE_WIDTH * lane_num;
 
     this->lanes.push_back(Lane(sf::Vector2f(position, 0)));
+}
+
+void Level::on_player_collision_with_car(Player* p, Car* c) {
+    p->wrecked = true;
+    c->wrecked = true;
+
+    std::cout << p->name << " collided with a car!" << std::endl;
+}
+
+CarCollisionResult Level::check_car_collisions() {
+
+    for (auto& player : players) {
+        for (auto& car : cars) {
+            float px = player.position.x;
+            float py = player.position.y;
+            float cx = car.position.x;
+            float cy = car.position.y;
+            float cw = car.width;
+            float ch = car.height;
+
+            if (2*std::abs(px - cx) < cw + PLAYER_WIDTH &&
+                2*std::abs(py - cy) < ch + PLAYER_HEIGHT &&
+                !player.wrecked) {
+                return CarCollisionResult{true, &player, &car};
+            }
+        }
+    }
+    return {false, nullptr, nullptr};
+}
+
+bool Level::is_offroad(sf::Vector2f pos, int width) const {
+    int left_edge = WINDOW_CENTER - road_width/2;
+    int right_edge = WINDOW_CENTER + road_width/2;
+    return pos.x <= left_edge || pos.x + width >= right_edge;
 }

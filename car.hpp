@@ -24,10 +24,13 @@ public:
 
     sf::Vector2f position;
 
+    int width;
+    int height;
+    bool wrecked;
+
 private:
     
     VehicleType type;
-
 
 };
 
