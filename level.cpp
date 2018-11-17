@@ -202,27 +202,31 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c) {
-    p->position -= p->velocity;
-    p->persistent_acceleration.x +=
-        (random() * COLLISION_MAX_BREAKAGE) - COLLISION_MAX_BREAKAGE / 2;
-    p->health -= COLLISION_DAMAGE;
+    if(p->collidee != c) {
+        p->collidee = c;
+        p->persistent_acceleration.x +=
+            (random() % COLLISION_MAX_BREAKAGE) - COLLISION_MAX_BREAKAGE / 2;
+        p->health -= COLLISION_DAMAGE;
 
-    if(p->health < 0) {
+        if(p->health < 0) {
+            p->wrecked = true;
+        }
         // p->wrecked = true;
-    }
-    // p->wrecked = true;
-    c->wrecked = true;
+        c->wrecked = true;
 
-    float sign = -1;
-    if(p->position.x > c->position.x) {
-        sign = 1;
+        float sign = -1;
+        if(p->position.x > c->position.x) {
+            sign = 1;
+        }
+        p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
+        std::cout << p->velocity.x << std::endl;
     }
-    p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
 }
 
 CarCollisionResult Level::check_car_collisions() {
 
     for (auto& player : players) {
+        bool collided = false;
         for (auto& car : cars) {
             float px = player.position.x;
             float py = player.position.y;
@@ -236,7 +240,10 @@ CarCollisionResult Level::check_car_collisions() {
                 !player.wrecked) {
                 return CarCollisionResult{true, &player, &car};
             }
+
         }
+
+        player.collidee = nullptr;
     }
     return {false, nullptr, nullptr};
 }

@@ -7,6 +7,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "powerup.hpp"
+#include "car.hpp"
 
 class Player {
 
@@ -34,6 +35,8 @@ public:
     input::InputHandler* input_handler;
 
     float invuln_time = 0;
+
+    Car* collidee = nullptr;
 
 private:
     float r, g, b;
