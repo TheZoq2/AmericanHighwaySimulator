@@ -39,6 +39,8 @@ public:
 
     Car* collidee = nullptr;
 
+    float transparency_time = 0;
+
 private:
     float r, g, b;
 

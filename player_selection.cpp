@@ -11,12 +11,14 @@ PlayerSelection::PlayerSelection() {
         sf::Keyboard::S,
         sf::Keyboard::A,
         sf::Keyboard::D,
+        sf::Keyboard::Q,
     };
     this->right = new input::KeyboardInputHandler {
         sf::Keyboard::I,
         sf::Keyboard::K,
         sf::Keyboard::J,
         sf::Keyboard::L,
+        sf::Keyboard::U,
     };
 }
 
