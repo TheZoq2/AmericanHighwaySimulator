@@ -48,10 +48,10 @@ void Level::update(float delta_time) {
         on_player_collision_with_car(collision.p, collision.car);
     }
 
-    handle_input(delta_time);
+    update_players_handle_input(delta_time);
 }
 
-void Level::handle_input(float delta_time) {
+void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
 
         // wrecked cars can't move
@@ -60,11 +60,20 @@ void Level::handle_input(float delta_time) {
             continue;
         }
 
+        float y_retardation = 1.;
+        if (is_offroad(player.position, PLAYER_WIDTH)) {
+            y_retardation = PLAYER_OFFROAD_ACC_RETARDATION;
+            player.position.y += PLAYER_OFFROAD_VEL_RETARDATION*delta_time;
+        }
+
+
         int dx{0}, dy{0};
         dy += PLAYER_ACCELERATION_Y
-            * player.input_handler->get_value(input::Action::DOWN);
+            * player.input_handler->get_value(input::Action::DOWN)
+            * (1/y_retardation);
         dy -= PLAYER_ACCELERATION_Y
-            * player.input_handler->get_value(input::Action::UP);
+            * player.input_handler->get_value(input::Action::UP)
+            * y_retardation;
         dx -= PLAYER_ACCELERATION_X
             * player.input_handler->get_value(input::Action::LEFT);
         dx += PLAYER_ACCELERATION_X
@@ -181,5 +190,11 @@ CarCollisionResult Level::check_car_collisions() {
         }
     }
     return {false, nullptr, nullptr};
+}
+
+bool Level::is_offroad(sf::Vector2f pos, int width) const {
+    int left_edge = WINDOW_CENTER - road_width/2;
+    int right_edge = WINDOW_CENTER + road_width/2;
+    return pos.x <= left_edge || pos.x + width >= right_edge;
 }
 

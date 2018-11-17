@@ -29,8 +29,10 @@ public:
 
 private:
 
-    void handle_input(float delta_time);
+    void update_players_handle_input(float delta_time);
     void spawn_car();
+
+    bool is_offroad(sf::Vector2f pos, int width) const;
 
     /*
      * Checks if Player p can be moved to new_pos. If it can,
