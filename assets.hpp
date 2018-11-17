@@ -23,5 +23,6 @@ public:
     Assets();
 
     Asset generic_car;
+    Asset lane;
 };
 #endif
