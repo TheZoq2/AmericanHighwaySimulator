@@ -13,26 +13,28 @@ int main() {
 
     Level level(5);
     Assets assets;
-    input::InputHandler mh{
+    auto mh = new input::KeyboardInputHandler {
         sf::Keyboard::W,
         sf::Keyboard::S,
         sf::Keyboard::A,
         sf::Keyboard::D,
     };
-    input::InputHandler ph{
+    auto ph = new input::KeyboardInputHandler {
         sf::Keyboard::Up,
         sf::Keyboard::Down,
         sf::Keyboard::Left,
         sf::Keyboard::Right,
     };
-    Player mamma{"Din mamma", mh, sf::Vector2f{500, 400}};
+
+    Player mamma("Din mamma", mh, sf::Vector2f{500, 400});
     level.add_player(mamma);
 
-    Player pappa{"Din pappa", ph, sf::Vector2f{1000, 400}};
+    Player pappa("Din pappa", ph, sf::Vector2f{1000, 400});
     level.add_player(pappa);
 
     typedef std::chrono::duration<float> FloatSeconds;
     float next_time_step = 0;
+
     while(window.isOpen()) {
         auto frame_start = std::chrono::steady_clock::now().time_since_epoch();
         sf::Event event;

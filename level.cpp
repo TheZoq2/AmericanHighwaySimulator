@@ -49,18 +49,14 @@ void Level::update(float delta_time) {
 void Level::handle_input(float delta_time) {
     for (auto& player : players) {
         int dx{0}, dy{0};
-        if (player.is_pressed(input::Action::DOWN)) {
-            dy += PLAYER_ACCELERATION_Y;
-        }
-        if (player.is_pressed(input::Action::UP)) {
-            dy -= PLAYER_ACCELERATION_Y;
-        }
-        if (player.is_pressed(input::Action::LEFT)) {
-            dx -= PLAYER_ACCELERATION_X;
-        }
-        if (player.is_pressed(input::Action::RIGHT)) {
-            dx += PLAYER_ACCELERATION_X;
-        }
+        dy += PLAYER_ACCELERATION_Y
+            * player.input_handler->get_value(input::Action::DOWN);
+        dy -= PLAYER_ACCELERATION_Y
+            * player.input_handler->get_value(input::Action::UP);
+        dx -= PLAYER_ACCELERATION_X
+            * player.input_handler->get_value(input::Action::LEFT);
+        dx += PLAYER_ACCELERATION_X
+            * player.input_handler->get_value(input::Action::RIGHT);
 
         sf::Vector2f acceleration(dx, dy);
         acceleration *= delta_time;
