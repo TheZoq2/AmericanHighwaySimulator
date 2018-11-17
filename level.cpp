@@ -26,7 +26,7 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
 void Level::update(float delta_time) {
     // Update cars
     for(auto& car: cars) {
-        car.update(delta);
+        car.update(delta_time);
     }
 
     // Filter removed cars

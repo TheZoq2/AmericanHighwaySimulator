@@ -12,5 +12,6 @@ const int CAR_AMOUNT = 10;
 const int LANE_WIDTH = 200;
 const int CAR_SPAWN_PROBABILITY = 10;
 const int CAR_SPAWN_Y = -300;
+const int CAR_SPEED = 50;
 
 #endif
