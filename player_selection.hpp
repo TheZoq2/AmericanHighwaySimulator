@@ -13,7 +13,7 @@ class PlayerSelection {
 public:
     PlayerSelection();
 
-    void draw(sf::RenderTarget* target);
+    void draw(sf::RenderTarget* target, Assets& assets);
 
     void run();
 

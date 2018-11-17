@@ -32,7 +32,7 @@ int main() {
         window.clear(sf::Color::Black);
 
         if(!player_selection.done) {
-            player_selection.draw(&window);
+            player_selection.draw(&window, assets);
             player_selection.run();
 
             if(player_selection.done) {

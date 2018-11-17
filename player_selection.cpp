@@ -20,8 +20,12 @@ PlayerSelection::PlayerSelection() {
     };
 }
 
-void PlayerSelection::draw(sf::RenderTarget* target) {
+void PlayerSelection::draw(sf::RenderTarget* target, Assets& assets) {
     target->draw(this->background);
+
+    for(auto& player: players) {
+        player.draw(target, assets);
+    }
 }
 
 void PlayerSelection::run() {
@@ -48,7 +52,7 @@ void PlayerSelection::run() {
         }
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
         done = true;
     }
 }
