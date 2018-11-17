@@ -13,10 +13,10 @@ PlayerSelection::PlayerSelection() {
         sf::Keyboard::D,
     };
     this->right = new input::KeyboardInputHandler {
-            sf::Keyboard::Up,
-            sf::Keyboard::Down,
-            sf::Keyboard::Left,
-            sf::Keyboard::Right,
+        sf::Keyboard::Up,
+        sf::Keyboard::Down,
+        sf::Keyboard::Left,
+        sf::Keyboard::Right,
     };
 }
 
