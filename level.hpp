@@ -53,6 +53,8 @@ private:
 
     void on_player_collision_with_car(Player* p, Car* c);
 
+    void check_if_players_within_bounds();
+
     int num_lanes;
 
     std::vector<Car> cars;
