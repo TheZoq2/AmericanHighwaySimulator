@@ -13,8 +13,8 @@ public:
 
     bool is_pressed(const input::Action ac);
 
-    sf::Vector2f position;
     std::string name;
+    sf::Vector2f position;
 
 private:
 
