@@ -6,19 +6,24 @@
 
 namespace input {
 
-    enum class Action { NONE, UP, LEFT, RIGHT };
+    enum class Action { NONE, UP, DOWN, LEFT, RIGHT };
 
     class InputHandler {
 
     public:
 
-        InputHandler(std::map<sf::Keyboard, Action>& action_map);
+        InputHandler(
+                sf::Keyboard::Key up,
+                sf::Keyboard::Key down,
+                sf::Keyboard::Key left,
+                sf::Keyboard::Key right
+                );
 
-        bool is_pressed(Action ac) const;
+        bool is_pressed(const Action ac);
 
     private:
 
-        std::map<sf::Keyboard, Action> action_map;
+        std::map<Action, sf::Keyboard::Key> action_map;
 
     };
 
