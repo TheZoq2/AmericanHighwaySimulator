@@ -13,10 +13,10 @@ PlayerSelection::PlayerSelection() {
         sf::Keyboard::D,
     };
     this->right = new input::KeyboardInputHandler {
-        sf::Keyboard::Up,
-        sf::Keyboard::Down,
-        sf::Keyboard::Left,
-        sf::Keyboard::Right,
+        sf::Keyboard::I,
+        sf::Keyboard::K,
+        sf::Keyboard::J,
+        sf::Keyboard::L,
     };
 }
 
@@ -49,6 +49,12 @@ void PlayerSelection::run() {
                     used_controllers.insert(i);
                 }
             }
+        }
+    }
+
+    for(auto& player : players) {
+        if(player.input_handler->get_value(input::Action::RIGHT) > 0.5) {
+            player.new_color();
         }
     }
 

@@ -8,6 +8,7 @@
 #include "input.hpp"
 #include "lane.hpp"
 #include "consts.hpp"
+#include "powerup.hpp"
 
 
 struct CarCollisionResult {
@@ -35,6 +36,8 @@ private:
     void spawn_car();
     void add_lane(int lane_num);
 
+    void spawn_powerup();
+
     bool is_offroad(sf::Vector2f pos, int width) const;
 
     /*
@@ -56,15 +59,30 @@ private:
 
     void check_if_players_within_bounds();
 
+    void update_player_status(sf::RenderTarget* target, Assets& assets);
+
     int num_lanes;
 
     std::vector<Car> cars;
+    std::vector<PowerUp> powerups;
     std::vector<Player> players;
     std::vector<Lane> lanes;
 
-    int lane_amount = 3;
+    int lane_amount = 6;
 
     int road_width;
+
+
+    /////////////////////////////////////////
+    // Powerups
+    /////////////////////////////////////////
+    
+    bool powerup_collides_with_player(PowerUp* pu, Player* p) const;
+    void update_and_spawn_powerups(float delta_time);
+    void draw_powerups(sf::RenderTarget* target, Assets& assets);
+    
+    void activate_sleepy_powerup();
+    void activate_transparency_powerup();
 };
 
 #endif /* ifndef LEVEL_H */

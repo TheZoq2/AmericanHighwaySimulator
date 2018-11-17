@@ -9,6 +9,11 @@ Level::Level(int num_lanes) {
 
     this->road_width = lane_amount * LANE_WIDTH;
 
+    sf::Texture bg_texture;
+    bg_texture.loadFromFile("../resources/grass.png");
+
+    sf::Sprite bg_sprite;
+    bg_sprite.setTexture(bg_texture);
 }
 
 Level::~Level() { }
@@ -26,6 +31,9 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
         player.draw(target, assets);
     }
 
+    for (auto& powerup : powerups) {
+        powerup.draw(target, assets);
+    }
 }
 
 
@@ -62,7 +70,7 @@ void Level::update(float delta_time) {
     this->lanes = new_lanes;
 
     // Add new lanes
-    while (lanes.size() < lane_amount * 2) {
+    while (lanes.size() < (size_t)lane_amount * 2) {
         for (int i = 0; i < lane_amount; i++) {
             add_lane(i);
         }
@@ -74,10 +82,14 @@ void Level::update(float delta_time) {
     }
 
     update_players_handle_input(delta_time);
+    update_and_spawn_powerups(delta_time);
 }
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        if (player.powerup != nullptr) {
+            player.powerup->angle += POWERUP_ANGLE_SPEED*delta_time;
+        }
 
         // wrecked cars can't move
         if (player.wrecked) {
@@ -92,7 +104,7 @@ void Level::update_players_handle_input(float delta_time) {
         }
 
         int dx{0}, dy{0};
-        dy += PLAYER_ACCELERATION_Y
+        dy += PLAYER_ACCELERATION_Y_DOWN
             * player.input_handler->get_value(input::Action::DOWN)
             * (1/y_retardation);
         dy -= PLAYER_ACCELERATION_Y
@@ -104,6 +116,7 @@ void Level::update_players_handle_input(float delta_time) {
             * player.input_handler->get_value(input::Action::RIGHT);
 
         sf::Vector2f acceleration(dx, dy);
+        acceleration += player.persistent_acceleration;
         acceleration *= delta_time;
 
         player.velocity += acceleration;
@@ -163,6 +176,7 @@ void Level::add_player(Player& player) {
 //          Private members
 ////////////////////////////////////////////////////////////////////////////////
 
+
 void Level::spawn_car() {
     auto lane = random() % lane_amount;
     // +0.5 to put the car in the center of the lane rather than on the side
@@ -196,10 +210,25 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c) {
-    p->wrecked = true;
-    c->wrecked = true;
+    if(p->collidee != c) {
+        p->collidee = c;
+        p->persistent_acceleration.x +=
+            (random() % COLLISION_MAX_BREAKAGE) - COLLISION_MAX_BREAKAGE / 2;
+        p->health -= COLLISION_DAMAGE;
 
-    std::cout << p->name << " collided with a car!" << std::endl;
+        if(p->health < 0) {
+            p->wrecked = true;
+        }
+        // p->wrecked = true;
+        c->wrecked = true;
+
+        float sign = -1;
+        if(p->position.x > c->position.x) {
+            sign = 1;
+        }
+        p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
+        std::cout << p->velocity.x << std::endl;
+    }
 }
 
 sf::Vector2f rotate_vector(sf::Vector2f vec, float angle) {
@@ -219,6 +248,7 @@ CarCollisionResult Level::check_car_collisions() {
             continue;
         }
 
+        bool collided = false;
         for (auto& car : cars) {
             auto pos = player.position;
             float px = player.position.x;
@@ -285,9 +315,13 @@ CarCollisionResult Level::check_car_collisions() {
             // TODO: calculate intersecting points for sparks
             return CarCollisionResult{true, points, &player, &car};
         }
+
+        player.collidee = nullptr;
     }
     return {false, points, nullptr, nullptr};
 }
+
+
 
 bool Level::is_offroad(sf::Vector2f pos, int width) const {
     int left_edge = WINDOW_CENTER - road_width/2;
@@ -304,5 +338,65 @@ void Level::check_if_players_within_bounds() {
             player.wrecked = true;
         }
     }
+}
+
+
+void Level::spawn_powerup() {
+    auto lane = random() % lane_amount;
+    // +0.5 to put the car in the center of the lane rather than on the side
+    auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
+
+    auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
+
+    PowerUpType type = static_cast<PowerUpType>(random() % NUM_POWERUPS);
+    this->powerups.push_back(
+            PowerUp {sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset), 
+            type, 0});
+}
+
+void Level::update_and_spawn_powerups(float delta_time) {
+    // maybe spawn powerup
+    auto r = random() % (int)(1/POWERUP_SPAWN_PROBABILITY);
+    if (r == 0) {
+        spawn_powerup();
+        std::cout << "SPAWNED POWERUP" << std::endl;
+    }
+
+    // update powerups
+    for (auto& powerup : powerups) {
+        powerup.position.y += ROAD_SPEED*delta_time;
+        powerup.angle += POWERUP_ANGLE_SPEED*delta_time;
+    }
+    
+    // check for player collisions
+    std::vector<size_t> indices_to_remove;
+    for (size_t i{0}; i < powerups.size(); ++i) {
+        PowerUp* powerup = &powerups[i];
+        for (auto& player : players) {
+            if (powerup_collides_with_player(powerup, &player)) {
+                // copy the powerup to the player
+                PowerUp* p = new PowerUp(*powerup);
+                player.set_powerup(p);
+                indices_to_remove.push_back(i);
+            }
+        }
+    }
+    // remove the picked-up powerups
+    for (auto i : indices_to_remove) {
+        powerups.erase(powerups.begin() + i);
+    }
+}
+
+bool Level::powerup_collides_with_player(PowerUp* pu, Player* p) const {
+    return std::abs(p->position.x - pu->position.x) < POWERUP_WIDTH &&
+           std::abs(p->position.y - pu->position.y) < POWERUP_HEIGHT;
+}
+
+void Level::activate_sleepy_powerup() {
+    std::cout << "Sleepy!" << std::endl;
+}
+
+void Level::activate_transparency_powerup() {
+    std::cout << "Transparency!" << std::endl;
 }
 

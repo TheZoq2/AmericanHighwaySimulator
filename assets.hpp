@@ -14,6 +14,8 @@ public:
     void draw(sf::RenderTarget* target, sf::Vector2f position, float angle);
     void draw(sf::RenderTarget* target, sf::Vector2f position, float angle, sf::Color color);
 
+    void set_origin(float x, float y);
+
     sf::Texture texture;
     sf::Sprite sprite;
 };
@@ -24,5 +26,8 @@ public:
 
     Asset generic_car;
     Asset lane;
+    Asset powerup;
+    Asset sleep;
+    Asset transparency;
 };
 #endif

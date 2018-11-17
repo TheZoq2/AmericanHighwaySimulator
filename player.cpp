@@ -12,10 +12,10 @@ Player::Player(
     this->input_handler = input_handler;
     this->wrecked = false;
     this->angle = 0;
+    this->powerup = nullptr;
+    this->persistent_acceleration = sf::Vector2f(0, 0);
 
-    r = random() % 255;
-    g = random() % 255;
-    b = random() % 255;
+    new_color();
 }
 
 
@@ -28,5 +28,24 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         angle,
         sf::Color(r, g, b)
     );
+
+    if (this->powerup != nullptr) {
+        sf::Vector2f powerup_pos = this->position + 
+            sf::Vector2f{0, PLAYER_HEIGHT*0.7};
+        this->powerup->draw_mini(target, assets, powerup_pos);
+    }
 }
 
+void Player::set_powerup(PowerUp* p) {
+    if (this->powerup != nullptr) {
+        delete this->powerup;
+    }
+    this->powerup = p;
+}
+
+
+void Player::new_color() {
+    r = random() % 255;
+    g = random() % 255;
+    b = random() % 255;
+}

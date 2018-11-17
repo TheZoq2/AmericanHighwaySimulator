@@ -9,8 +9,10 @@ Asset::Asset(std::string path) {
     }
 
     this->sprite.setTexture(this->texture);
-    this->sprite.setOrigin(PLAYER_WIDTH / 2, PLAYER_HEIGHT / 2);
+    this->sprite.setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
 }
+
+
 
 
 void Asset::draw(sf::RenderTarget* target, sf::Vector2f position) {
@@ -27,9 +29,18 @@ void Asset::draw(sf::RenderTarget* target, sf::Vector2f position, float angle, s
     target->draw(sprite);
 }
 
+void Asset::set_origin(float x, float y) {
+    auto size = texture.getSize();
+    sprite.setOrigin(sf::Vector2f(size.x * x, size.y * y));
+}
+
 
 Assets::Assets() :
     generic_car("../resources/car.png"),
-    lane("../resources/lane.png")
+    lane("../resources/lane.png"),
+    powerup("../resources/powerup.png"),
+    sleep("../resources/sleep.png"),
+    transparency("../resources/transparency.png")
 {
+    lane.set_origin(0,0);
 }
