@@ -29,23 +29,23 @@ ControllerInputHandler::ControllerInputHandler(int id) :
 {}
 
 float ControllerInputHandler::get_value(const Action ac) {
-    auto axis_x = sf::Joystick::getAxisPosition(id, sf::Joystick::X);
-    auto axis_y = sf::Joystick::getAxisPosition(id, sf::Joystick::Y);
+    auto axis_x = sf::Joystick::getAxisPosition(id, sf::Joystick::X) / 100;
+    auto axis_y = sf::Joystick::getAxisPosition(id, sf::Joystick::Y) / 100;
 
     switch (ac) {
         case Action::UP:
-            if (axis_y > 0) {
-                return axis_y;
+            if (axis_y < 0) {
+                return -axis_y;
             }
             break;
         case Action::DOWN:
-            if (axis_y < 0) {
+            if (axis_y > 0) {
                 return axis_y;
             }
             break;
         case Action::LEFT:
             if (axis_x < 0) {
-                return axis_x;
+                return -axis_x;
             }
             break;
         case Action::RIGHT:
@@ -57,4 +57,5 @@ float ControllerInputHandler::get_value(const Action ac) {
             return 0;
             break;
     }
+    return 0;
 }
