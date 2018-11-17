@@ -7,6 +7,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "powerup.hpp"
+#include "car.hpp"
 
 class Player {
 
@@ -18,6 +19,7 @@ public:
     void draw(sf::RenderTarget* target, Assets& assets) const;
 
     void set_powerup(PowerUp* p);
+    void new_color();
 
     std::string name;
     sf::Vector2f position;
@@ -34,6 +36,8 @@ public:
     input::InputHandler* input_handler;
 
     float invuln_time = 0;
+
+    Car* collidee = nullptr;
 
 private:
     float r, g, b;
