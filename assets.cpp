@@ -19,6 +19,7 @@ void Asset::draw(sf::RenderTarget* target, sf::Vector2f position) {
 
 
 Assets::Assets() :
-    generic_car("../resources/car.png")
+    generic_car("../resources/car.png"),
+    lane("../resources/lane.png")
 {
 }
