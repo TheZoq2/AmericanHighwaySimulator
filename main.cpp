@@ -25,10 +25,10 @@ int main() {
         sf::Keyboard::Left,
         sf::Keyboard::Right,
     };
-    Player mamma{"Din mamma", mh, sf::Vector2f{0, 0}};
+    Player mamma{"Din mamma", mh, sf::Vector2f{500, 400}};
     level.add_player(mamma);
 
-    Player pappa{"Din pappa", ph, sf::Vector2f{500, 0}};
+    Player pappa{"Din pappa", ph, sf::Vector2f{1000, 400}};
     level.add_player(pappa);
 
     typedef std::chrono::duration<float> FloatSeconds;
@@ -44,7 +44,6 @@ int main() {
 
         level.update(next_time_step);
 
-
         window.clear(sf::Color::Black);
 
         level.draw(&window, assets);
@@ -54,8 +53,6 @@ int main() {
         auto frame_end = std::chrono::steady_clock::now().time_since_epoch();
         auto delta = std::chrono::duration_cast<FloatSeconds>(frame_end - frame_start);
         next_time_step = delta.count();
-
-        std::cout << next_time_step << std::endl;
     }
 
     return 0;

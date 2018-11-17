@@ -2,12 +2,9 @@
 #include <iostream>
 #include <algorithm>
 #include <cmath>
-#include "consts.hpp"
 
 Level::Level(int num_lanes) {
     this->num_lanes = num_lanes;
-
-    this->cars.push_back(Car(VehicleType::CAR, sf::Vector2f(100, 100)));
 
     this->road_width = lane_amount * LANE_WIDTH;
 }
@@ -41,14 +38,10 @@ void Level::update(float delta_time) {
     this->cars = new_cars;
 
     // Spawn new cars
-    if(cars.size() < CAR_AMOUNT) {
-        if(random() % 100 > CAR_SPAWN_PROBABILITY ) {
-            spawn_car();
-        }
+    while(cars.size() < CAR_AMOUNT) {
+        spawn_car();
     }
 
-
-    handle_input();
 
     for (auto& player : players) {
         std::cout << player.name << ": " <<
@@ -59,31 +52,43 @@ void Level::update(float delta_time) {
     if (collision.collision_occurred) {
         on_player_collision_with_car(collision.p, collision.car);
     }
+
+    handle_input(delta_time);
 }
 
-void Level::handle_input() {
+void Level::handle_input(float delta_time) {
     for (auto& player : players) {
         int dx{0}, dy{0};
         if (player.is_pressed(input::Action::DOWN)) {
-            dy += PLAYER_SPEED;
+            dy += PLAYER_ACCELERATION_Y;
         }
         if (player.is_pressed(input::Action::UP)) {
-            dy -= PLAYER_SPEED;
+            dy -= PLAYER_ACCELERATION_Y;
         }
         if (player.is_pressed(input::Action::LEFT)) {
-            dx -= PLAYER_SPEED;
+            dx -= PLAYER_ACCELERATION_X;
         }
         if (player.is_pressed(input::Action::RIGHT)) {
-            dx += PLAYER_SPEED;
+            dx += PLAYER_ACCELERATION_X;
         }
 
-        sf::Vector2f dxdy(dx, dy);
-        sf::Vector2f new_pos = player.position + dxdy;
+        sf::Vector2f acceleration(dx, dy);
+        acceleration *= delta_time;
+
+        player.velocity += acceleration;
+
+        if (player.velocity.x > PLAYER_MAX_VEL_X) {
+            player.velocity.x = PLAYER_MAX_VEL_X;
+        }
+        if (-player.velocity.x < -PLAYER_MAX_VEL_X) {
+            player.velocity.x = PLAYER_MAX_VEL_X;
+        }
+
+        sf::Vector2f new_pos = player.position + player.velocity * delta_time;
         Player* collided = get_colliding_player(&player, new_pos);
         if (collided == nullptr) {
-            player.position += dxdy;
+            player.position += player.velocity * delta_time;
         } else {
-
             // this is to prevent on_player_collision to be fired
             // more than once per collision
             if (player.just_collided_with != collided) {
@@ -134,10 +139,20 @@ void Level::spawn_car() {
     // +0.5 to put the car in the center of the lane rather than on the side
     auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
 
-    this->cars.push_back(Car(sf::Vector2f(position, CAR_SPAWN_Y)));
+    auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
+
+    this->cars.push_back(Car(sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset)));
 }
 
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
+    float avg_velocity = (collider->velocity.x - collider->velocity.x) / 2;
+    float sign = -1;
+    if(collider->position.x > collided->position.x) {
+        sign = 1;
+    }
+    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1 - avg_velocity;
+    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1 + avg_velocity;
+
     // TODO do something fun
     std::cout << collider->name << " collided with " 
         << collided->name << "!" << std::endl;

@@ -4,11 +4,14 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 
+#include "consts.hpp"
+
 class Asset {
 public:
     Asset(std::string path);
 
     void draw(sf::RenderTarget* target, sf::Vector2f position);
+    void draw(sf::RenderTarget* target, sf::Vector2f position, float angle);
 
     sf::Texture texture;
     sf::Sprite sprite;

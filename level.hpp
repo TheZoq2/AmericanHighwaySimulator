@@ -6,8 +6,8 @@
 #include "car.hpp"
 #include "player.hpp"
 #include "input.hpp"
+#include "consts.hpp"
 
-const float PLAYER_SPEED = 2.;
 
 struct CarCollisionResult {
     const bool collision_occurred;
@@ -29,7 +29,7 @@ public:
 
 private:
 
-    void handle_input();
+    void handle_input(float delta_time);
     void spawn_car();
 
     /*
