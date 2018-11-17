@@ -44,11 +44,6 @@ void Level::update(float delta_time) {
 
 
     handle_input(delta_time);
-
-    for (auto& player : players) {
-        std::cout << player.name << ": " <<
-            player.position.x << ", " << player.position.y << std::endl;
-    }
 }
 
 void Level::handle_input(float delta_time) {
@@ -140,12 +135,13 @@ void Level::spawn_car() {
 }
 
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
+    float avg_velocity = (collider->velocity.x - collider->velocity.x) / 2;
     float sign = -1;
     if(collider->position.x > collided->position.x) {
         sign = 1;
     }
-    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
-    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1;
+    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1 - avg_velocity;
+    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1 + avg_velocity;
 
     // TODO do something fun
     std::cout << collider->name << " collided with " 

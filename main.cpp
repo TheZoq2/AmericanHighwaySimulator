@@ -53,8 +53,6 @@ int main() {
         auto frame_end = std::chrono::steady_clock::now().time_since_epoch();
         auto delta = std::chrono::duration_cast<FloatSeconds>(frame_end - frame_start);
         next_time_step = delta.count();
-
-        std::cout << next_time_step << std::endl;
     }
 
     return 0;
