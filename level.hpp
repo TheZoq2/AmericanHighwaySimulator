@@ -9,6 +9,12 @@
 
 const float PLAYER_SPEED = 2.;
 
+struct CarCollisionResult {
+    const bool collision_occurred;
+    const Player* p;
+    const Car* car;
+};
+
 class Level {
 
 public:
@@ -33,7 +39,15 @@ private:
      */
     Player* get_colliding_player(const Player* p, sf::Vector2f new_pos);
 
+    /*
+     * Returns a CarCollisionResult containing information about
+     * whether a player has collided with a car.
+     */
+    CarCollisionResult check_car_collisions() const;
+
     void on_player_collision_with_other(Player* collider, Player* collided);
+
+    void on_player_collision_with_car(const Player* p, const Car* c);
 
     int num_lanes;
 

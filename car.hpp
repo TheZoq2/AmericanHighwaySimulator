@@ -24,6 +24,9 @@ public:
 
     sf::Vector2f position;
 
+    int width;
+    int height;
+
 private:
     
     VehicleType type;

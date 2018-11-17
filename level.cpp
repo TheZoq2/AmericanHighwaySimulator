@@ -54,6 +54,11 @@ void Level::update(float delta_time) {
         std::cout << player.name << ": " <<
             player.position.x << ", " << player.position.y << std::endl;
     }
+
+    CarCollisionResult collision = check_car_collisions();
+    if (collision.collision_occurred) {
+        on_player_collision_with_car(collision.p, collision.car);
+    }
 }
 
 void Level::handle_input() {
@@ -136,5 +141,30 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     // TODO do something fun
     std::cout << collider->name << " collided with " 
         << collided->name << "!" << std::endl;
+}
+
+void Level::on_player_collision_with_car(const Player* p, const Car* c) {
+    // TODO do something fun
+    std::cout << p->name << " collided with a car!" << std::endl;
+}
+
+CarCollisionResult Level::check_car_collisions() const {
+
+    for (auto& player : players) {
+        for (auto& car : cars) {
+            float px = player.position.x;
+            float py = player.position.y;
+            float cx = car.position.x;
+            float cy = car.position.y;
+            float cw = car.width;
+            float ch = car.height;
+
+            if (2*std::abs(px - cx) < cw + PLAYER_WIDTH &&
+                2*std::abs(py - cy) < ch + PLAYER_HEIGHT) {
+                return {true, &player, &car};
+            }
+        }
+    }
+    return {false, nullptr, nullptr};
 }
 
