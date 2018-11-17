@@ -7,30 +7,15 @@
 #include "assets.hpp"
 #include "consts.hpp"
 #include "input.hpp"
+#include "player_selection.hpp"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "American highway simulator");
 
     Level level(5);
     Assets assets;
-    auto mh = new input::KeyboardInputHandler {
-        sf::Keyboard::W,
-        sf::Keyboard::S,
-        sf::Keyboard::A,
-        sf::Keyboard::D,
-    };
-    auto ph = new input::KeyboardInputHandler {
-        sf::Keyboard::Up,
-        sf::Keyboard::Down,
-        sf::Keyboard::Left,
-        sf::Keyboard::Right,
-    };
 
-    Player mamma("Din mamma", mh, sf::Vector2f{500, 400});
-    level.add_player(mamma);
-
-    Player pappa("Din pappa", ph, sf::Vector2f{1000, 400});
-    level.add_player(pappa);
+    PlayerSelection player_selection;
 
     typedef std::chrono::duration<float> FloatSeconds;
     float next_time_step = 0;
@@ -44,11 +29,26 @@ int main() {
             }
         }
 
-        level.update(next_time_step);
-
         window.clear(sf::Color::Black);
 
-        level.draw(&window, assets);
+        if(!player_selection.done) {
+            player_selection.draw(&window);
+            player_selection.run();
+
+            if(player_selection.done) {
+                for(auto player : player_selection.players) {
+                    level.add_player(player);
+                }
+            }
+        }
+        else {
+            level.update(next_time_step);
+
+            level.draw(&window, assets);
+        }
+
+
+
 
         window.display();
 
