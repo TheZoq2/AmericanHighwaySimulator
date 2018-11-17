@@ -23,8 +23,9 @@ public:
     bool wrecked;
 
     input::InputHandler* input_handler;
-private:
 
+private:
+    float r, g, b;
 
 };
 

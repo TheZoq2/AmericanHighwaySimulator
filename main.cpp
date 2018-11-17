@@ -12,6 +12,8 @@
 int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "American highway simulator");
 
+    srand(time(NULL));
+
     Level level(5);
     Assets assets;
 
