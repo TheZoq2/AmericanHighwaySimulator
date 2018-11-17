@@ -11,6 +11,7 @@ Player::Player(
     this->just_collided_with = nullptr;
     this->input_handler = input_handler;
     this->wrecked = false;
+    this->powerup = nullptr;
 
     r = random() % 255;
     g = random() % 255;
@@ -27,5 +28,12 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         visual_angle,
         sf::Color(r, g, b)
     );
+}
+
+void Player::set_powerup(PowerUp* p) {
+    if (this->powerup != nullptr) {
+        delete this->powerup;
+    }
+    this->powerup = p;
 }
 

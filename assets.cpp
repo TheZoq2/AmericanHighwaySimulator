@@ -37,7 +37,8 @@ void Asset::set_origin(float x, float y) {
 
 Assets::Assets() :
     generic_car("../resources/car.png"),
-    lane("../resources/lane.png")
+    lane("../resources/lane.png"),
+    powerup("../resources/powerup.png")
 {
     lane.set_origin(0,0);
 }

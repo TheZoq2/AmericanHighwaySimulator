@@ -26,5 +26,9 @@ const float PLAYER_MAX_VEL_X = 1000;
 const float PLAYER_OFFROAD_ACC_RETARDATION = 0.6;
 const float PLAYER_OFFROAD_VEL_RETARDATION = 70;
 
+const float POWERUP_SPAWN_PROBABILITY = 0.01;
+const float POWERUP_ANGLE_SPEED = 100;
+const int POWERUP_HEIGHT = 207;
+const int POWERUP_WIDTH = 147;
 
 #endif

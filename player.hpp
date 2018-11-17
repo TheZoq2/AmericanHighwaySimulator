@@ -6,6 +6,7 @@
 #include "consts.hpp"
 #include <string>
 #include <SFML/Graphics.hpp>
+#include "powerup.hpp"
 
 class Player {
 
@@ -16,11 +17,15 @@ public:
 
     void draw(sf::RenderTarget* target, Assets& assets) const;
 
+    void set_powerup(PowerUp* p);
+
     std::string name;
     sf::Vector2f position;
     Player* just_collided_with;
     sf::Vector2f velocity;
     bool wrecked;
+
+    PowerUp* powerup;
 
     input::InputHandler* input_handler;
 
