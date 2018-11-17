@@ -25,6 +25,7 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
 
 
 void Level::update(float delta_time) {
+    check_if_players_within_bounds();
     // Update cars
     for(auto& car: cars) {
         car.update(delta_time);
@@ -65,7 +66,6 @@ void Level::update_players_handle_input(float delta_time) {
             y_retardation = PLAYER_OFFROAD_ACC_RETARDATION;
             player.position.y += PLAYER_OFFROAD_VEL_RETARDATION*delta_time;
         }
-
 
         int dx{0}, dy{0};
         dy += PLAYER_ACCELERATION_Y
@@ -115,7 +115,7 @@ Player* Level::get_colliding_player(const Player* p, sf::Vector2f new_pos) {
         // we don't care if we collide with ourselves
         if (other != p) {
             sf::Vector2f pos = other->position;
-            
+
             float new_x = new_pos.x;
             float other_x = pos.x;
             float new_y = new_pos.y;
@@ -135,8 +135,6 @@ void Level::add_player(Player& player) {
 }
 
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
 //          Private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,6 +150,9 @@ void Level::spawn_car() {
 }
 
 void Level::on_player_collision_with_other(Player* collider, Player* collided) {
+    if (collided->wrecked) {
+        collider->wrecked;
+    }
     float avg_velocity = (collider->velocity.x - collider->velocity.x) / 2;
     float sign = -1;
     if(collider->position.x > collided->position.x) {
@@ -196,5 +197,16 @@ bool Level::is_offroad(sf::Vector2f pos, int width) const {
     int left_edge = WINDOW_CENTER - road_width/2;
     int right_edge = WINDOW_CENTER + road_width/2;
     return pos.x <= left_edge || pos.x + width >= right_edge;
+}
+
+void Level::check_if_players_within_bounds() {
+    for (auto& player : players) {
+        if (player.position.x + PLAYER_WIDTH < 0 ||
+            player.position.x > WINDOW_WIDTH ||
+            player.position.y + PLAYER_HEIGHT < 0 ||
+            player.position.y > WINDOW_HEIGHT) {
+            player.wrecked = true;
+        }
+    }
 }
 
