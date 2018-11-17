@@ -38,8 +38,14 @@ int main() {
             player_selection.run();
 
             if(player_selection.done) {
-                for(auto player : player_selection.players) {
-                    level.add_player(player);
+                auto players = player_selection.players;
+                auto player_amount = player_selection.players.size();
+                for(std::size_t i = 0; i < player_amount; ++i) {
+                    players[i].position.x = WINDOW_CENTER
+                        + PLAYER_WIDTH * 2 * i
+                        - PLAYER_WIDTH * player_amount;
+                    
+                    level.add_player(players[i]);
                 }
             }
         }
