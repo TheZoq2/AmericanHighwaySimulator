@@ -87,6 +87,8 @@ void Level::update(float delta_time) {
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        player.shake_left -= delta_time;
+
         if (player.powerup != nullptr) {
             player.powerup->angle += POWERUP_ANGLE_SPEED*delta_time;
         }
@@ -189,12 +191,19 @@ void Level::add_player(Player& player) {
 
 void Level::spawn_car() {
     auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
-    if(random() % 100 > 50) {
+    auto seed = random() % 100;
+    if(seed > 40) {
+        auto type = VehicleType::CAR;
+        if(seed > 90) {
+            type = VehicleType::MOTORBIKE;
+        }
         auto lane = random() % lane_amount;
         // +0.5 to put the car in the center of the lane rather than on the side
         auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
 
-        this->cars.push_back(Car(sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset)));
+        this->cars.push_back(
+            Car(type, sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset))
+        );
     }
     else {
         auto range = (WINDOW_WIDTH - road_width);
@@ -239,6 +248,7 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c) {
+    // Shake the player for a short time
     if(c->type == VehicleType::ROCK) {
         p->wrecked = true;
     }
@@ -246,7 +256,22 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
         p->collidee = c;
         p->persistent_acceleration.x +=
             (random() % COLLISION_MAX_BREAKAGE) - COLLISION_MAX_BREAKAGE / 2;
-        p->health -= COLLISION_DAMAGE;
+
+        if(c->type != VehicleType::MOTORBIKE) {
+            // Update health
+            p->health -= COLLISION_DAMAGE;
+
+            // Bounce
+            float sign = -1;
+            if(p->position.x > c->position.x) {
+                sign = 1;
+            }
+            p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
+            std::cout << p->velocity.x << std::endl;
+        }
+        else {
+            p->shake_left = 0.15;
+        }
 
         if(p->health < 0) {
             p->wrecked = true;
@@ -254,12 +279,6 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
         // p->wrecked = true;
         c->wrecked = true;
 
-        float sign = -1;
-        if(p->position.x > c->position.x) {
-            sign = 1;
-        }
-        p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
-        std::cout << p->velocity.x << std::endl;
     }
 }
 

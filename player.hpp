@@ -42,6 +42,8 @@ public:
 
     float transparency_time = 0;
 
+    float shake_left = 0;
+
 private:
     void draw_lights(sf::RenderTarget* target, float visual_angle, Assets& assets) const;
 

@@ -22,6 +22,11 @@ Player::Player(
 void Player::draw(sf::RenderTarget* target, Assets& assets) const {
     float visual_angle = atan2(velocity.x, 100) * 10;
 
+    auto shake = sf::Vector2f(0, 0);
+    if(shake_left > 0) {
+        shake = sf::Vector2f((random() % 600) / 100., (random() % 600) / 100.);
+    }
+
     auto asset = assets.generic_car[0];
     if (wrecked){
         asset = assets.generic_car[3];
@@ -41,7 +46,7 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
 
     asset.draw(
         target,
-        this->position,
+        this->position + shake,
         visual_angle,
         c
     );

@@ -64,6 +64,10 @@ Assets::Assets() :
         Asset("../resources/outgas1.png"),
         Asset("../resources/outgas2.png"),
         Asset("../resources/outgas3.png")
+    },
+    motorcycle{
+        Asset("../resources/motorcycle.png"),
+        Asset("../resources/motorcycle_crashed.png"),
     }
 {
     lane.set_origin(0,0);

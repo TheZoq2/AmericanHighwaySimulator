@@ -8,7 +8,7 @@ const int WINDOW_CENTER = WINDOW_WIDTH / 2;
 
 
 // Game parameters
-const int CAR_AMOUNT = 14;
+const int CAR_AMOUNT = 15;
 const int LANE_WIDTH = 200;
 const int CAR_SPAWN_Y = -300;
 const int CAR_DESPAWN_Y = WINDOW_HEIGHT - CAR_SPAWN_Y;
@@ -17,6 +17,8 @@ const int CAR_SPEED = 100;
 const int CAR_SPEED_VARIATION = 100;
 const float ROAD_SPEED = 800;
 const int ROCK_SIZE = 200;
+const int MOTORCYCLE_WIDTH = 40;
+const int MOTORCYCLE_HEIGHT = 100;
 
 const int PLAYER_WIDTH = 119;
 const int PLAYER_HEIGHT = 249;
