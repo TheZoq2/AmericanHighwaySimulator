@@ -73,7 +73,9 @@ Assets::Assets() :
     tractor{
         Asset("../resources/tractor.png"),
         Asset("../resources/tractor_broken.png")
-    }
+    },
+    bmv("../resources/bmv.png"),
+    crosshair("../resources/crosshair.png")
 {
     lane.set_origin(0,0);
 }

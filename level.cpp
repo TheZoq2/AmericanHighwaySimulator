@@ -89,6 +89,7 @@ void Level::update(float delta_time) {
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        update_target_selection(&player, delta_time);
         player.shake_left -= delta_time;
 
         if (player.powerup != nullptr) {
@@ -258,8 +259,6 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1 - avg_velocity;
     collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1 + avg_velocity;
 
-    std::cout << collider->name << " collided with " 
-        << collided->name << "!" << std::endl;
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c) {
@@ -282,7 +281,6 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
                 sign = 1;
             }
             p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
-            std::cout << p->velocity.x << std::endl;
         }
         else {
             // shake the car a bit since you ran over someone
@@ -353,7 +351,14 @@ void Level::spawn_powerup() {
 
     auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
 
-    PowerUpType type = static_cast<PowerUpType>(random() % NUM_POWERUPS);
+    PowerUpType type;
+
+    do {
+        type = static_cast<PowerUpType>(random() % NUM_POWERUPS);
+
+    // only spawn non-attack powerups if only one person is playing
+    } while(type == PowerUpType::SLEEPY && players.size() == 1);
+
     this->powerups.push_back(
             PowerUp {sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset), 
             type, 0});
@@ -364,7 +369,6 @@ void Level::update_and_spawn_powerups(float delta_time) {
     auto r = random() % (int)(1/POWERUP_SPAWN_PROBABILITY);
     if (r == 0) {
         spawn_powerup();
-        std::cout << "SPAWNED POWERUP" << std::endl;
     }
 
     // update powerups
@@ -378,7 +382,8 @@ void Level::update_and_spawn_powerups(float delta_time) {
     for (size_t i{0}; i < powerups.size(); ++i) {
         PowerUp* powerup = &powerups[i];
         for (auto& player : players) {
-            if (powerup_collides_with_player(powerup, &player)) {
+            if (powerup_collides_with_player(powerup, &player) &&
+                !player.selection_mode) {
                 // copy the powerup to the player
                 PowerUp* p = new PowerUp(*powerup);
                 player.set_powerup(p);
@@ -410,13 +415,67 @@ void Level::fire_player_powerup(Player* p) {
     p->powerup = nullptr;
 }
 
+void Level::actually_fire_sleepy_powerup(Player* p) {
+    
+}
+
 void Level::activate_sleepy_powerup(Player* p) {
+    if (p->selection_mode) {
+        deactivate_target_selection(p);
+        actually_fire_sleepy_powerup(p);
+    } else {
+        if (!this->someone_selecting) {
+            activate_target_selection(p);
+        }
+    }
     std::cout << "Sleepy!" << std::endl;
 }
 
 void Level::activate_transparency_powerup(Player* p) {
     p->transparency_time = TRANSPARENCY_TIME;
     std::cout << "Transparency!" << std::endl;
+}
+
+void Level::activate_target_selection(Player* p) {
+    this->someone_selecting = true;
+    size_t initial_index = 0; 
+    if (&players[0] == p) {
+        initial_index++;
+    }
+    p->selected_target_index = initial_index;
+    p->selection_mode = true;
+    p->selection_time = TARGET_SELECTION_TIME;
+    players[initial_index].target_selected = true;
+    players[initial_index].selected_by = p;
+}
+
+void Level::deactivate_target_selection(Player* p) {
+    this->someone_selecting = false;
+    p->selection_mode = false;
+    p->selection_time = 0;
+    players[p->selected_target_index].target_selected = false;
+    players[p->selected_target_index].selected_by = nullptr;
+}
+
+void Level::update_target_selection(Player* p, float delta_time) {
+    if (p->selection_mode) {
+        if (p->selection_time > 0) {
+            p->selection_time -= delta_time;
+        } else {
+            std::cout << "changing" << std::endl;
+            // increment selection
+            players[p->selected_target_index].target_selected = false;
+            players[p->selected_target_index].selected_by = nullptr;
+            p->selection_time = TARGET_SELECTION_TIME;
+            size_t index = (p->selected_target_index + 1) % players.size();
+            if (&players[index] == p) {
+                index = (index + 1) % players.size();
+            }
+            p->selected_target_index = index;
+            players[index].target_selected = true;
+            players[index].selected_by = p;
+        }
+    }
 }
 
 
