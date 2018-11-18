@@ -1,7 +1,9 @@
 #include "player.hpp"
 
 #include <math.h>
+#include <cmath>
 #include <chrono>
+#include <iostream>
 
 Player::Player(
     std::string name,
@@ -60,15 +62,39 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         this->powerup->draw_mini(target, assets, powerup_pos);
     }
 
-    if (this->is_transparent()) {
+    if (this->is_transparent() || this->is_bmv() || 
+            this->is_sleepy() || this->is_inverted()) {
         float amount = this->transparency_time/TRANSPARENCY_TIME;
+        if(this->is_bmv()) {
+            amount = this->bmv_time/BMV_TIME;
+        } else if (this->is_sleepy()){
+            amount = this->sleepy_time/SLEEPY_TIME;
+        } else if (this->is_inverted()) {
+            amount = this->inverted_time/INVERTED_TIME;
+        }
         sf::RectangleShape transparency_bar
             {sf::Vector2f{amount*PLAYER_WIDTH, TRANSPARENCY_BAR_HEIGHT}};
         sf::Vector2f bar_pos = this->position + 
             sf::Vector2f{-PLAYER_WIDTH/2, PLAYER_HEIGHT*0.7};
         transparency_bar.setPosition(bar_pos);
-        transparency_bar.setFillColor(sf::Color{50, 50, 255, 255});
+        if (this->is_sleepy() || this->is_inverted()) {
+            transparency_bar.setFillColor(sf::Color{255, 0, 0, 255});
+        } else {
+            transparency_bar.setFillColor(sf::Color{50, 50, 255, 255});
+        }
         target->draw(transparency_bar);
+    }
+
+    if (this->target_selected) {
+        sf::Color c(
+            this->selected_by->r,
+            this->selected_by->g,
+            this->selected_by->b
+        );
+        float angle = selected_by->selection_time*TARGET_SELECTION_ANGLE_SPEED;
+        assets.crosshair.draw(
+                target, this->position, angle,
+                c);
     }
 
     this->draw_lights(target, visual_angle, assets);
@@ -81,6 +107,17 @@ void Player::set_powerup(PowerUp* p) {
     this->powerup = p;
 }
 
+bool Player::is_sleepy() const {
+    return sleepy_time > 0;
+}
+
+bool Player::is_inverted() const {
+    return inverted_time > 0;
+}
+
+bool Player::is_bmv() const {
+    return bmv_time > 0;
+}
 
 void Player::new_color() {
     r = random() % 255;
@@ -97,7 +134,7 @@ void Player::draw_lights(
             std::chrono::system_clock::now().time_since_epoch()
         );
 
-    if(ms.count() % 500 > 250) {
+    if(ms.count() % 500 > 250 && !is_bmv()) {
         if (this->velocity.x > 0.2 * PLAYER_MAX_VEL_X) {
             assets.turn_right.draw(
                 target,

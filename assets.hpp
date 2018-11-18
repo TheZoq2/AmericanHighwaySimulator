@@ -39,5 +39,11 @@ public:
     Asset motorcycle[2];
     Asset truck;
     Asset game_over;
+    Asset tractor[2];
+    Asset bmv;
+    Asset crosshair;
+    Asset inverted;
+    Asset police;
+    Asset police_lights[2];
 };
 #endif

@@ -22,6 +22,9 @@ public:
     void new_color();
 
     bool is_transparent() const;
+    bool is_sleepy() const;
+    bool is_inverted() const;
+    bool is_bmv() const;
 
     std::string name;
     sf::Vector2f position;
@@ -42,13 +45,27 @@ public:
     Car* collidee = nullptr;
 
     float transparency_time = 0;
+    float bmv_time = 0;
 
     float shake_left = 0;
 
+    bool selection_mode = false;
+    bool target_selected = false;
+    float selection_time = 0;
+
+    float sleepy_time = 0;
+    float inverted_time = 0;
+
+    Player* selected_by = nullptr;
+    size_t selected_target_index;
+    bool already_entered_selection = false;
+
+    PowerUpType next_powerup = PowerUpType::INVERTED;
+
+    float r, g, b;
 private:
     void draw_lights(sf::RenderTarget* target, float visual_angle, Assets& assets) const;
 
-    float r, g, b;
 
 };
 

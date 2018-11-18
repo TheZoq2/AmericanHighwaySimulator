@@ -20,11 +20,18 @@ Car::Car(VehicleType type, sf::Vector2f position) {
     if(type == VehicleType::MOTORBIKE) {
         this->width = MOTORCYCLE_WIDTH;
         this->height = MOTORCYCLE_HEIGHT;
-        this->velocity *= 1.4;
+        this->velocity *= 0.7;
     }
     if(type == VehicleType::TRUCK) {
         this->height = TRUCK_HEIGHT;
-        this->velocity *= 0.7;
+        this->velocity *= 1.4;
+    }
+    if(type == VehicleType::TRACTOR) {
+        this->velocity *= 2.0;
+    }
+    if(type == VehicleType::POLICE) {
+        this->height = TRUCK_HEIGHT;
+        this->velocity = POLICE_SPEED;
     }
     this->wrecked = false;
 }
@@ -43,6 +50,22 @@ void Car::draw(sf::RenderTarget* target, Assets& assets) const {
     else if(type == VehicleType::TRUCK) {
         auto asset = assets.truck;
         asset.draw(target, this->position);
+    }
+    else if(type == VehicleType::TRACTOR) {
+        auto asset = assets.tractor[0];
+        if(wrecked) {
+            asset = assets.tractor[1];
+        }
+        asset.draw(target, this->position);
+    }
+    else if(type == VehicleType::POLICE) {
+        auto asset = assets.police;
+        auto light = assets.police_lights[random()%2];
+        if(wrecked) {
+            // asset = assets.tractor[1];
+        }
+        asset.draw(target, this->position);
+        light.draw(target, this->position);
     }
     else {
         auto asset = assets.generic_car[0];

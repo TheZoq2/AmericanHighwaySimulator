@@ -52,7 +52,12 @@ void Level::update(float delta_time) {
     // Filter removed cars
     std::vector<Car> new_cars;
     std::copy_if(cars.begin(), cars.end(), std::back_inserter(new_cars), [&](auto car) {
-        return car.position.y < WINDOW_HEIGHT * 2;
+        if(car.type == VehicleType::POLICE) {
+            return car.position.y > -500;
+        }
+        else {
+            return car.position.y < WINDOW_HEIGHT * 2;
+        }
     });
 
     this->cars = new_cars;
@@ -89,6 +94,7 @@ void Level::update(float delta_time) {
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        update_target_selection(&player, delta_time);
         player.shake_left -= delta_time;
 
         if (player.powerup != nullptr) {
@@ -112,6 +118,7 @@ void Level::update_players_handle_input(float delta_time) {
         if (player.is_transparent()) {
             player.transparency_time -= delta_time;
         }
+        player.bmv_time -= delta_time;
 
         float y_retardation = 1.;
         if (is_offroad(player.position, PLAYER_WIDTH)) {
@@ -134,8 +141,34 @@ void Level::update_players_handle_input(float delta_time) {
         sf::Vector2f acceleration(dx, dy);
         acceleration += player.persistent_acceleration;
         acceleration *= delta_time;
+        if(player.bmv_time > 0) {
+            acceleration *= BMV_ACC_MODIFIER;
+        }
 
-        player.velocity += acceleration;
+        if (player.is_inverted()) {
+            acceleration *= (float)-1.0;
+        }
+
+        auto target_y_velocity =
+            ( player.input_handler->get_value(input::Action::DOWN)
+            - player.input_handler->get_value(input::Action::UP)
+            )
+            * PLAYER_MAX_VEL_Y;
+        auto target_x_velocity =
+            ( player.input_handler->get_value(input::Action::RIGHT)
+            - player.input_handler->get_value(input::Action::LEFT)
+            )
+            * PLAYER_MAX_VEL_X;
+
+        if (!player.is_sleepy()) {
+            // player.velocity.x += acceleration.x;
+            std::cout << player.velocity.x << std::endl;
+            player.velocity.y += (target_y_velocity - player.velocity.y) * 0.03;
+            player.velocity.x += (target_x_velocity - player.velocity.x) * 0.03;
+        }
+
+        update_sleepiness(&player, delta_time);
+        update_invertedness(&player, delta_time);
 
         if (player.velocity.x > PLAYER_MAX_VEL_X) {
             player.velocity.x = PLAYER_MAX_VEL_X;
@@ -160,8 +193,16 @@ void Level::update_players_handle_input(float delta_time) {
         player.just_collided_with = collided;
 
         if (player.input_handler->get_value(input::Action::FIRE) &&
-            player.powerup != nullptr) {
-            fire_player_powerup(&player);
+                !player.is_sleepy() &&
+                !player.is_bmv() &&
+                !player.is_transparent() &&
+            (player.powerup != nullptr || player.selection_mode)) {
+            if (!player.already_entered_selection) {
+                fire_player_powerup(&player);
+            }
+            player.already_entered_selection = true;
+        } else if (player.already_entered_selection) {
+            player.already_entered_selection = false;
         }
     }
 }
@@ -209,6 +250,9 @@ void Level::spawn_car() {
         else if(seed > 80) {
             type = VehicleType::TRUCK;
         }
+        else if(seed > 70) {
+            type = VehicleType::TRACTOR;
+        }
         auto lane = random() % lane_amount;
         // +0.5 to put the car in the center of the lane rather than on the side
         auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
@@ -255,8 +299,6 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1 - avg_velocity;
     collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1 + avg_velocity;
 
-    std::cout << collider->name << " collided with " 
-        << collided->name << "!" << std::endl;
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c) {
@@ -279,7 +321,6 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
                 sign = 1;
             }
             p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
-            std::cout << p->velocity.x << std::endl;
         }
         else {
             // shake the car a bit since you ran over someone
@@ -292,6 +333,13 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
         // p->wrecked = true;
         if(c->type != VehicleType::TRUCK) {
             c->wrecked = true;
+        }
+
+        if(c->type == VehicleType::MOTORBIKE) {
+            sf::Vector2f position(c->position.x, POLICE_SPAWN_DISTANCE);
+            this->cars.push_back(
+                Car(VehicleType::POLICE, position)
+            );
         }
     }
 }
@@ -350,7 +398,15 @@ void Level::spawn_powerup() {
 
     auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
 
-    PowerUpType type = static_cast<PowerUpType>(random() % NUM_POWERUPS);
+    PowerUpType type;
+
+    do {
+        type = static_cast<PowerUpType>(random() % NUM_POWERUPS);
+
+    // only spawn non-attack powerups if only one person is playing
+    } while((type == PowerUpType::SLEEPY || type == PowerUpType::INVERTED)
+                && players.size() == 1);
+
     this->powerups.push_back(
             PowerUp {sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset), 
             type, 0});
@@ -361,7 +417,6 @@ void Level::update_and_spawn_powerups(float delta_time) {
     auto r = random() % (int)(1/POWERUP_SPAWN_PROBABILITY);
     if (r == 0) {
         spawn_powerup();
-        std::cout << "SPAWNED POWERUP" << std::endl;
     }
 
     // update powerups
@@ -375,7 +430,9 @@ void Level::update_and_spawn_powerups(float delta_time) {
     for (size_t i{0}; i < powerups.size(); ++i) {
         PowerUp* powerup = &powerups[i];
         for (auto& player : players) {
-            if (powerup_collides_with_player(powerup, &player)) {
+            if (powerup_collides_with_player(powerup, &player) &&
+                !player.selection_mode &&
+                !player.is_sleepy()) {
                 // copy the powerup to the player
                 PowerUp* p = new PowerUp(*powerup);
                 player.set_powerup(p);
@@ -395,6 +452,14 @@ bool Level::powerup_collides_with_player(PowerUp* pu, Player* p) const {
 }
 
 void Level::fire_player_powerup(Player* p) {
+    if (p->powerup == nullptr) {
+        if (p->next_powerup == PowerUpType::INVERTED) {
+            activate_inverted_powerup(p);
+        } else if (p->next_powerup == PowerUpType::SLEEPY) {
+            activate_sleepy_powerup(p);
+        }
+        return;
+    }
     switch (p->powerup->type) {
         case PowerUpType::SLEEPY:
             activate_sleepy_powerup(p);
@@ -402,18 +467,117 @@ void Level::fire_player_powerup(Player* p) {
         case PowerUpType::TRANSPARENCY:
             activate_transparency_powerup(p);
             break;
+        case PowerUpType::BMV:
+            activate_bmv_powerup(p);
+            break;
+        case PowerUpType::INVERTED:
+            activate_inverted_powerup(p);
+            break;
     }
     delete p->powerup;
     p->powerup = nullptr;
 }
 
+void Level::actually_fire_sleepy_powerup(Player* p) {
+    size_t index = p->selected_target_index;
+    Player* target = &players[index];
+    target->sleepy_time = SLEEPY_TIME;
+}
+
+void Level::actually_fire_inverted_powerup(Player* p) {
+    size_t index = p->selected_target_index;
+    Player* target = &players[index];
+    target->inverted_time = INVERTED_TIME;
+}
+
 void Level::activate_sleepy_powerup(Player* p) {
-    std::cout << "Sleepy!" << std::endl;
+    p->next_powerup = PowerUpType::SLEEPY;
+    if (p->selection_mode) {
+        std::cout << "Sleepy!" << std::endl;
+        deactivate_target_selection(p);
+        actually_fire_sleepy_powerup(p);
+    } else {
+        if (!this->someone_selecting) {
+            activate_target_selection(p);
+        }
+    }
+}
+
+void Level::update_sleepiness(Player* p, float delta_time) {
+    if (p->is_sleepy()) {
+        p->sleepy_time -= delta_time;
+    }
+}
+
+void Level::update_invertedness(Player* p, float delta_time) {
+    if (p->is_inverted()) {
+        p->inverted_time -= delta_time;
+    }
 }
 
 void Level::activate_transparency_powerup(Player* p) {
     p->transparency_time = TRANSPARENCY_TIME;
     std::cout << "Transparency!" << std::endl;
+}
+
+void Level::activate_bmv_powerup(Player* p) {
+    p->bmv_time = BMV_TIME;
+    std::cout << "Brutto Mational Value!" << std::endl;
+}
+
+void Level::activate_inverted_powerup(Player* p) {
+    p->next_powerup = PowerUpType::INVERTED;
+    if (p->selection_mode) {
+        std::cout << "INVERTED!" << std::endl;
+        deactivate_target_selection(p);
+        actually_fire_inverted_powerup(p);
+    } else {
+        if (!this->someone_selecting) {
+            activate_target_selection(p);
+        }
+    }
+}
+
+void Level::activate_target_selection(Player* p) {
+    this->someone_selecting = true;
+    size_t initial_index = 0; 
+    if (&players[0] == p) {
+        initial_index++;
+    }
+    p->selected_target_index = initial_index;
+    p->selection_mode = true;
+    p->selection_time = TARGET_SELECTION_TIME;
+    players[initial_index].target_selected = true;
+    players[initial_index].selected_by = p;
+}
+
+void Level::deactivate_target_selection(Player* p) {
+    this->someone_selecting = false;
+    p->selection_mode = false;
+    p->selection_time = 0;
+    players[p->selected_target_index].target_selected = false;
+    players[p->selected_target_index].selected_by = nullptr;
+}
+
+void Level::update_target_selection(Player* p, float delta_time) {
+    if (p->selection_mode) {
+        if (p->selection_time > 0) {
+            p->selection_time -= delta_time;
+        } else {
+            std::cout << "changing" << std::endl;
+            // increment selection
+            players[p->selected_target_index].target_selected = false;
+            players[p->selected_target_index].selected_by = nullptr;
+            p->selection_time = TARGET_SELECTION_TIME;
+            size_t index = (p->selected_target_index + 1) % players.size();
+            if (&players[index] == p) {
+                index = (index + 1) % players.size();
+            }
+            p->selected_target_index = index;
+            players[index].target_selected = true;
+            players[index].selected_by = p;
+        }
+    }
 }
 
 

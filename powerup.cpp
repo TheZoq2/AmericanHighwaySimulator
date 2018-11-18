@@ -9,6 +9,12 @@ void PowerUp::draw(sf::RenderTarget* target, Assets& assets) const {
         case PowerUpType::TRANSPARENCY:
             assets.transparency.draw(target, this->position, this->angle);
             break;
+        case PowerUpType::BMV:
+            assets.bmv.draw(target, this->position, this->angle);
+            break;
+        case PowerUpType::INVERTED:
+            assets.inverted.draw(target, this->position, this->angle);
+            break;
     }
 }
 
@@ -22,6 +28,12 @@ void PowerUp::draw_mini(sf::RenderTarget* target, Assets& assets,
             break;
         case PowerUpType::TRANSPARENCY:
             assets.transparency.draw(target, pos, this->angle, scale);
+            break;
+        case PowerUpType::BMV:
+            assets.bmv.draw(target, pos, this->angle, scale);
+            break;
+        case PowerUpType::INVERTED:
+            assets.inverted.draw(target, pos, this->angle, scale);
             break;
     }
 }
