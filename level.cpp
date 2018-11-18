@@ -44,6 +44,11 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
 
 
 void Level::update(float delta_time, Assets& assets) {
+    if(get_players_left() < 1) {
+        std::cout << "No players left " << game_over_timeout << std::endl;
+        game_over_timeout -= delta_time;
+    }
+
     check_if_players_within_bounds();
     // Update lanes
     for (auto& lane : lanes) {
@@ -555,6 +560,7 @@ void Level::activate_inverted_powerup(Player* p) {
 
 void Level::activate_target_selection(Player* p) {
     this->someone_selecting = true;
+    this->selection_timeout = 4;
     size_t initial_index = 0; 
     if (&players[0] == p) {
         initial_index++;
@@ -575,7 +581,15 @@ void Level::deactivate_target_selection(Player* p) {
 }
 
 void Level::update_target_selection(Player* p, float delta_time) {
-    if (p->selection_mode) {
+    selection_timeout -= delta_time;
+    if (selection_timeout < 0) {
+        for(auto& player : players) {
+            if(player.selection_mode) {
+                deactivate_target_selection(&player);
+            }
+        }
+    }
+    else if (p->selection_mode) {
         if (p->selection_time > 0) {
             p->selection_time -= delta_time;
         } else {
@@ -597,6 +611,7 @@ void Level::update_target_selection(Player* p, float delta_time) {
 
 
 void Level::car_on_car_collision() {
+    /*
     for(auto& car : cars) {
         for(auto& other: cars) {
             // If these are the same cars or they are not in the same lane
@@ -617,6 +632,7 @@ void Level::car_on_car_collision() {
             }
         }
     }
+    */
 }
 
 int Level::get_players_left() {
