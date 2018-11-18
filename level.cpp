@@ -431,7 +431,6 @@ void Level::car_on_car_collision() {
             {
                 break;
             }
-            std::cout << car.position.x << " " << other.position.x << std::endl;
 
             if(distance < (car.height + other.height)) {
                 // This one is catching up, slow down
