@@ -70,6 +70,10 @@ Assets::Assets() :
         Asset("../resources/motorcycle_crashed.png"),
     },
     truck("../resources/truck.png"),
+    tractor{
+        Asset("../resources/tractor.png"),
+        Asset("../resources/tractor_broken.png")
+    },
     bmv("../resources/bmv.png"),
     crosshair("../resources/crosshair.png")
 {

@@ -3,6 +3,7 @@
 #include <math.h>
 #include <cmath>
 #include <chrono>
+#include <iostream>
 
 Player::Player(
     std::string name,
@@ -61,8 +62,11 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         this->powerup->draw_mini(target, assets, powerup_pos);
     }
 
-    if (this->is_transparent()) {
+    if (this->is_transparent() || this->bmv_time > 0) {
         float amount = this->transparency_time/TRANSPARENCY_TIME;
+        if(this->bmv_time > 0) {
+            amount = this->bmv_time/BMV_TIME;
+        }
         sf::RectangleShape transparency_bar
             {sf::Vector2f{amount*PLAYER_WIDTH, TRANSPARENCY_BAR_HEIGHT}};
         sf::Vector2f bar_pos = this->position + 
@@ -113,7 +117,7 @@ void Player::draw_lights(
             std::chrono::system_clock::now().time_since_epoch()
         );
 
-    if(ms.count() % 500 > 250) {
+    if(ms.count() % 500 > 250 && bmv_time < 0) {
         if (this->velocity.x > 0.2 * PLAYER_MAX_VEL_X) {
             assets.turn_right.draw(
                 target,
