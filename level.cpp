@@ -301,8 +301,8 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     if(collider->position.x > collided->position.x) {
         sign = 1;
     }
-    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1 - avg_velocity;
-    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1 + avg_velocity;
+    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 1 - avg_velocity;
+    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 1 + avg_velocity;
 
 }
 

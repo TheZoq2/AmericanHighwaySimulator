@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(AmericanHighwaySimulator)
 
-set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wno-unused -pedantic -lsfml-graphics -lsfml-window -lsfml-system")
+set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wno-unused -pedantic -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 file(GLOB OhCrapImBlind_SRC
     "*.cpp"
