@@ -45,4 +45,6 @@ const float TRANSPARENCY_OPACITY = 100;
 const float TARGET_SELECTION_TIME = 1;
 const float TARGET_SELECTION_ANGLE_SPEED = 100;
 
+const float WRECK_RETARDATION = 0.8;
+
 #endif
