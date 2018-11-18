@@ -12,7 +12,18 @@ Asset::Asset(std::string path) {
     this->sprite.setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
 }
 
+SoundAsset::SoundAsset(std::string path) {
+    if(!this->buffer.loadFromFile(path)) {
+        std::cout << "Failed to load sound " << path << std::endl;
+        exit(-1);
+    }
+}
 
+sf::Sound* SoundAsset::get_sound() {
+    sf::Sound* sound = new sf::Sound;
+    sound->setBuffer(this->buffer);
+    return sound;
+}
 
 
 void Asset::draw(sf::RenderTarget* target, sf::Vector2f position) {
@@ -81,7 +92,8 @@ Assets::Assets() :
     police_lights{
         Asset("../resources/police_lights_1.png"),
         Asset("../resources/police_lights_2.png"),
-    }
+    },
+    engine("../resources/audio/car.ogg")
 {
     lane.set_origin(0,0);
 

@@ -15,7 +15,7 @@ public:
 
     void draw(sf::RenderTarget* target, Assets& assets);
 
-    void run();
+    void run(Assets& assets);
 
     std::vector<Player> players;
 
@@ -24,7 +24,7 @@ public:
     int spawn_x = 200;
 
 private:
-    void add_player(input::InputHandler* handler);
+    void add_player(input::InputHandler* handler, Assets& assets);
 
     input::KeyboardInputHandler* left;
     input::KeyboardInputHandler* right;

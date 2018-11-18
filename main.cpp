@@ -53,7 +53,7 @@ int main() {
 
         if(!player_selection.done) {
             player_selection.draw(&window, assets);
-            player_selection.run();
+            player_selection.run(assets);
 
             if(player_selection.done) {
                 auto players = player_selection.players;

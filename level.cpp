@@ -146,7 +146,7 @@ void Level::update_players_handle_input(float delta_time) {
         }
 
         if (player.is_inverted()) {
-            acceleration *= (float)-1.0;
+            acceleration *= -1.f;
         }
 
         if (!player.is_sleepy()) {
