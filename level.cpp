@@ -555,6 +555,7 @@ void Level::activate_inverted_powerup(Player* p) {
 
 void Level::activate_target_selection(Player* p) {
     this->someone_selecting = true;
+    this->selection_timeout = 4;
     size_t initial_index = 0; 
     if (&players[0] == p) {
         initial_index++;
@@ -575,7 +576,15 @@ void Level::deactivate_target_selection(Player* p) {
 }
 
 void Level::update_target_selection(Player* p, float delta_time) {
-    if (p->selection_mode) {
+    selection_timeout -= delta_time;
+    if (selection_timeout < 0) {
+        for(auto& player : players) {
+            if(player.selection_mode) {
+                deactivate_target_selection(&player);
+            }
+        }
+    }
+    else if (p->selection_mode) {
         if (p->selection_time > 0) {
             p->selection_time -= delta_time;
         } else {

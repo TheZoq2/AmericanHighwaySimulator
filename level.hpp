@@ -82,6 +82,8 @@ private:
 
     bool someone_selecting = false;
 
+    float selection_timeout;
+
 
     /////////////////////////////////////////
     // Powerups

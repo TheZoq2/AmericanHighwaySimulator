@@ -36,7 +36,7 @@ const float PLAYER_MAX_VEL_Y = 700;
 const int COLLISION_MAX_BREAKAGE = 500;
 const float COLLISION_DAMAGE = 40;
 
-const float POWERUP_SPAWN_PROBABILITY = 0.01;
+const float POWERUP_SPAWN_PROBABILITY = 0.03;
 const float POWERUP_ANGLE_SPEED = 100;
 const int POWERUP_HEIGHT = 70;
 const int POWERUP_WIDTH = 70;
