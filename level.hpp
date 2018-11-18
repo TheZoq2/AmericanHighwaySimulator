@@ -35,7 +35,7 @@ public:
 
 private:
 
-    void update_players_handle_input(float delta_time);
+    void update_players_handle_input(float delta_time, Assets& assets);
     void spawn_car(Assets& assets);
     void add_lane(int lane_num);
 
@@ -56,7 +56,8 @@ private:
      */
     CarCollisionResult check_car_collisions();
 
-    void on_player_collision_with_other(Player* collider, Player* collided);
+    void on_player_collision_with_other(Player* collider, Player* collided,
+            Assets& assets);
 
     void on_player_collision_with_car(Player* p, Car* c, Assets& assets);
 
@@ -68,6 +69,9 @@ private:
 
     sf::Sound* macke;
     sf::Sound* police;
+    sf::Sound* bump;
+    sf::Sound* crash;
+    sf::Sound* powerup_sound;
 
     std::vector<Car> cars;
     std::vector<PowerUp> powerups;

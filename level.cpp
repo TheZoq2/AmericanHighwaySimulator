@@ -17,7 +17,9 @@ Level::Level(int num_lanes, Assets& assets) {
 
     this->police = assets.siren.get_sound();
     this->macke = assets.macke.get_sound();
-
+    this->bump = assets.bump[0].get_sound();
+    this->crash = assets.crash[2].get_sound();
+    this->powerup_sound = assets.powerup_sound.get_sound();
 }
 
 Level::~Level() { }
@@ -93,10 +95,10 @@ void Level::update(float delta_time, Assets& assets) {
     car_on_car_collision();
 
     update_and_spawn_powerups(delta_time);
-    update_players_handle_input(delta_time);
+    update_players_handle_input(delta_time, assets);
 }
 
-void Level::update_players_handle_input(float delta_time) {
+void Level::update_players_handle_input(float delta_time, Assets& assets) {
     for (auto& player : players) {
         player.update_engine_noise();
         update_target_selection(&player, delta_time);
@@ -194,7 +196,7 @@ void Level::update_players_handle_input(float delta_time) {
             // this is to prevent on_player_collision to be fired
             // more than once per collision
             if (player.just_collided_with != collided) {
-                on_player_collision_with_other(&player, collided);
+                on_player_collision_with_other(&player, collided, assets);
             }
         }
         // this is to prevent on_player_collision to be fired
@@ -296,7 +298,8 @@ void Level::add_lane(int lane_num) {
     this->lanes.push_back(Lane(sf::Vector2f(x_position, 0)));
 }
 
-void Level::on_player_collision_with_other(Player* collider, Player* collided) {
+void Level::on_player_collision_with_other(Player* collider,
+        Player* collided, Assets& assets) {
     if (collided->wrecked) {
         collider->wrecked = true;
     }
@@ -307,7 +310,7 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     }
     collider->velocity.x = sign * PLAYER_MAX_VEL_X * 1 - avg_velocity;
     collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 1 + avg_velocity;
-
+    this->bump->play();
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c, Assets& assets) {
@@ -352,6 +355,7 @@ void Level::on_player_collision_with_car(Player* p, Car* c, Assets& assets) {
             this->macke->play();
         }
     }
+    this->crash->play();
 }
 
 CarCollisionResult Level::check_car_collisions() {
@@ -447,6 +451,7 @@ void Level::update_and_spawn_powerups(float delta_time) {
                 PowerUp* p = new PowerUp(*powerup);
                 player.set_powerup(p);
                 indices_to_remove.push_back(i);
+                this->powerup_sound->play();
             }
         }
     }
