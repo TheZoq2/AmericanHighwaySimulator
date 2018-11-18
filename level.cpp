@@ -53,7 +53,7 @@ void Level::update(float delta_time) {
     std::vector<Car> new_cars;
     std::copy_if(cars.begin(), cars.end(), std::back_inserter(new_cars), [&](auto car) {
         if(car.type == VehicleType::POLICE) {
-            return car.position.y > -500;
+            return car.position.y > -500 && car.position.y < WINDOW_HEIGHT * 3;
         }
         else {
             return car.position.y < WINDOW_HEIGHT * 2;
@@ -120,35 +120,20 @@ void Level::update_players_handle_input(float delta_time) {
         }
         player.bmv_time -= delta_time;
 
-        float y_retardation = 1.;
-        if (is_offroad(player.position, PLAYER_WIDTH)) {
-            y_retardation = PLAYER_OFFROAD_ACC_RETARDATION;
-            player.position.y += PLAYER_OFFROAD_VEL_RETARDATION*delta_time;
-        }
-
         int dx{0}, dy{0};
         dy += PLAYER_ACCELERATION_Y_DOWN
-            * player.input_handler->get_value(input::Action::DOWN)
-            * (1/y_retardation);
+            * player.input_handler->get_value(input::Action::DOWN);
         dy -= PLAYER_ACCELERATION_Y
-            * player.input_handler->get_value(input::Action::UP)
-            * y_retardation;
+            * player.input_handler->get_value(input::Action::UP);
         dx -= PLAYER_ACCELERATION_X
             * player.input_handler->get_value(input::Action::LEFT);
         dx += PLAYER_ACCELERATION_X
             * player.input_handler->get_value(input::Action::RIGHT);
 
-        sf::Vector2f acceleration(dx, dy);
-        acceleration += player.persistent_acceleration;
-        acceleration *= delta_time;
-        if(player.bmv_time > 0) {
-            acceleration *= BMV_ACC_MODIFIER;
-        }
 
         auto sign = 1;
         if (player.is_inverted()) {
             sign = -1;
-            acceleration *= (float)-1.0;
         }
 
         auto extra_performance = 1.0;
@@ -166,6 +151,10 @@ void Level::update_players_handle_input(float delta_time) {
             - player.input_handler->get_value(input::Action::LEFT)
             )
             * PLAYER_MAX_VEL_X * sign * extra_performance;
+
+        if (is_offroad(player.position, PLAYER_WIDTH)) {
+            target_y_velocity += PLAYER_MAX_VEL_Y / 2;
+        }
 
         if (!player.is_sleepy()) {
             // player.velocity.x += acceleration.x;
