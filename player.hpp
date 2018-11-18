@@ -42,6 +42,7 @@ public:
     Car* collidee = nullptr;
 
     float transparency_time = 0;
+    float bmv_time = 0;
 
     float shake_left = 0;
 

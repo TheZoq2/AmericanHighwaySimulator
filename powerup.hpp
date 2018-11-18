@@ -4,9 +4,9 @@
 #include <SFML/Graphics.hpp>
 #include "assets.hpp"
 
-const int NUM_POWERUPS = 2;
 enum PowerUpType {
-    SLEEPY, TRANSPARENCY
+    SLEEPY, TRANSPARENCY, BMV,
+    NUM_POWERUPS
 };
 
 struct PowerUp {

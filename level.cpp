@@ -113,6 +113,7 @@ void Level::update_players_handle_input(float delta_time) {
         if (player.is_transparent()) {
             player.transparency_time -= delta_time;
         }
+        player.bmv_time -= delta_time;
 
         float y_retardation = 1.;
         if (is_offroad(player.position, PLAYER_WIDTH)) {
@@ -135,6 +136,9 @@ void Level::update_players_handle_input(float delta_time) {
         sf::Vector2f acceleration(dx, dy);
         acceleration += player.persistent_acceleration;
         acceleration *= delta_time;
+        if(player.bmv_time > 0) {
+            acceleration *= BMV_ACC_MODIFIER;
+        }
 
         player.velocity += acceleration;
 
@@ -410,6 +414,9 @@ void Level::fire_player_powerup(Player* p) {
         case PowerUpType::TRANSPARENCY:
             activate_transparency_powerup(p);
             break;
+        case PowerUpType::BMV:
+            activate_bmv_powerup(p);
+            break;
     }
     delete p->powerup;
     p->powerup = nullptr;
@@ -434,6 +441,11 @@ void Level::activate_sleepy_powerup(Player* p) {
 void Level::activate_transparency_powerup(Player* p) {
     p->transparency_time = TRANSPARENCY_TIME;
     std::cout << "Transparency!" << std::endl;
+}
+
+void Level::activate_bmv_powerup(Player* p) {
+    p->bmv_time = BMV_TIME;
+    std::cout << "Brutto Mational Value!" << std::endl;
 }
 
 void Level::activate_target_selection(Player* p) {
