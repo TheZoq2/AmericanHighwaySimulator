@@ -45,10 +45,17 @@ public:
 
     float shake_left = 0;
 
+    bool selection_mode = false;
+    bool target_selected = false;
+    float selection_time = 0;
+
+    Player* selected_by = nullptr;
+    size_t selected_target_index;
+
+    float r, g, b;
 private:
     void draw_lights(sf::RenderTarget* target, float visual_angle, Assets& assets) const;
 
-    float r, g, b;
 
 };
 

@@ -1,6 +1,7 @@
 #include "player.hpp"
 
 #include <math.h>
+#include <cmath>
 #include <chrono>
 
 Player::Player(
@@ -69,6 +70,18 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         transparency_bar.setPosition(bar_pos);
         transparency_bar.setFillColor(sf::Color{50, 50, 255, 255});
         target->draw(transparency_bar);
+    }
+
+    if (this->target_selected) {
+        sf::Color c(
+            this->selected_by->r,
+            this->selected_by->g,
+            this->selected_by->b
+        );
+        float angle = selected_by->selection_time*TARGET_SELECTION_ANGLE_SPEED;
+        assets.crosshair.draw(
+                target, this->position, angle,
+                c);
     }
 
     this->draw_lights(target, visual_angle, assets);

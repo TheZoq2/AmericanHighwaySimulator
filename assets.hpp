@@ -38,5 +38,7 @@ public:
     Asset outgas[3];
     Asset motorcycle[2];
     Asset truck;
+    Asset bmv;
+    Asset crosshair;
 };
 #endif
