@@ -19,7 +19,10 @@ Level::Level(int num_lanes, Assets& assets) {
     this->macke = assets.macke.get_sound();
     this->bump = assets.bump[0].get_sound();
     this->crash = assets.crash[2].get_sound();
+    this->crash->setVolume(60.f);
     this->powerup_sound = assets.powerup_sound.get_sound();
+    this->bmw1 = assets.bmv_sound[0].get_sound();
+    this->bmw2 = assets.bmv_sound[1].get_sound();
 }
 
 Level::~Level() { }
@@ -543,6 +546,11 @@ void Level::activate_transparency_powerup(Player* p) {
 
 void Level::activate_bmv_powerup(Player* p) {
     p->bmv_time = BMV_TIME;
+    if (random() % 2) {
+        this->bmw1->play();
+    } else {
+        this->bmw2->play();
+    }
     std::cout << "Brutto Mational Value!" << std::endl;
 }
 

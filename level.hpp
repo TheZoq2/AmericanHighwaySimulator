@@ -74,6 +74,8 @@ private:
     sf::Sound* bump;
     sf::Sound* crash;
     sf::Sound* powerup_sound;
+    sf::Sound* bmw1;
+    sf::Sound* bmw2;
 
     std::vector<Car> cars;
     std::vector<PowerUp> powerups;

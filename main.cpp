@@ -35,7 +35,7 @@ int main() {
     Level level(5, assets);
     sf::Sound* music = assets.music.get_sound();
     music->setLoop(true);
-    music->setVolume(80.f);
+    music->setVolume(70.f);
     music->play();
 
     PlayerSelection player_selection;
