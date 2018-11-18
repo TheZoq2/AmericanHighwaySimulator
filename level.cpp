@@ -145,12 +145,17 @@ void Level::update_players_handle_input(float delta_time) {
             ( player.input_handler->get_value(input::Action::DOWN)
             - player.input_handler->get_value(input::Action::UP)
             )
-            * PLAYER_MAX_VEL_Y * sign * extra_performance;
+            * PLAYER_MAX_VEL_Y
+            * sign
+            * extra_performance;
         auto target_x_velocity =
             ( player.input_handler->get_value(input::Action::RIGHT)
             - player.input_handler->get_value(input::Action::LEFT)
             )
-            * PLAYER_MAX_VEL_X * sign * extra_performance;
+            * PLAYER_MAX_VEL_X
+            * sign
+            * extra_performance
+            + player.persistent_acceleration.x;
 
         if (is_offroad(player.position, PLAYER_WIDTH)) {
             target_y_velocity += PLAYER_MAX_VEL_Y / 2;
