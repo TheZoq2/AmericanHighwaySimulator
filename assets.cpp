@@ -46,11 +46,30 @@ void Asset::set_origin(float x, float y) {
 
 
 Assets::Assets() :
-    generic_car("../resources/car.png"),
+    generic_car{
+        Asset("../resources/car.png"),
+        Asset("../resources/car_hit.png"),
+        Asset("../resources/car_damaged.png"),
+        Asset("../resources/car_broken_down.png")
+    },
     lane("../resources/lane.png"),
     powerup("../resources/powerup.png"),
     sleep("../resources/sleep.png"),
-    transparency("../resources/transparency.png")
+    transparency("../resources/transparency.png"),
+    rock("../resources/rock.png"),
+    turn_left("../resources/turn_left.png"),
+    turn_right("../resources/turn_right.png"),
+    breaking("../resources/breaking.png"),
+    outgas {
+        Asset("../resources/outgas1.png"),
+        Asset("../resources/outgas2.png"),
+        Asset("../resources/outgas3.png")
+    },
+    motorcycle{
+        Asset("../resources/motorcycle.png"),
+        Asset("../resources/motorcycle_crashed.png"),
+    },
+    truck("../resources/truck.png")
 {
     lane.set_origin(0,0);
 }

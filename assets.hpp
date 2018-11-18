@@ -26,10 +26,17 @@ class Assets {
 public:
     Assets();
 
-    Asset generic_car;
+    Asset generic_car[4];
     Asset lane;
     Asset powerup;
     Asset sleep;
     Asset transparency;
+    Asset rock;
+    Asset turn_left;
+    Asset turn_right;
+    Asset breaking;
+    Asset outgas[3];
+    Asset motorcycle[2];
+    Asset truck;
 };
 #endif

@@ -12,13 +12,45 @@ Car::Car(VehicleType type, sf::Vector2f position) {
     // TODO FIXME TODO FIXME TODO FIXME TODO FIXME TODO FIXME TODO FIXME 
     this->width = PLAYER_WIDTH;
     this->height = PLAYER_HEIGHT;
-    this->wrecked = false;
-
     this->velocity = CAR_SPEED + (random() % CAR_SPEED_VARIATION);
+    if(type == VehicleType::ROCK) {
+        this->width = this->height = ROCK_SIZE;
+        this->velocity = ROAD_SPEED;
+    }
+    if(type == VehicleType::MOTORBIKE) {
+        this->width = MOTORCYCLE_WIDTH;
+        this->height = MOTORCYCLE_HEIGHT;
+        this->velocity *= 1.4;
+    }
+    if(type == VehicleType::TRUCK) {
+        this->height = TRUCK_HEIGHT;
+        this->velocity *= 0.7;
+    }
+    this->wrecked = false;
 }
 
 void Car::draw(sf::RenderTarget* target, Assets& assets) const {
-    assets.generic_car.draw(target, this->position);
+    if(type == VehicleType::ROCK) {
+        assets.rock.draw(target, this->position);
+    }
+    else if(type == VehicleType::MOTORBIKE) {
+        auto asset = assets.motorcycle[0];
+        if(wrecked) {
+            asset = assets.motorcycle[1];
+        }
+        asset.draw(target, this->position);
+    }
+    else if(type == VehicleType::TRUCK) {
+        auto asset = assets.truck;
+        asset.draw(target, this->position);
+    }
+    else {
+        auto asset = assets.generic_car[0];
+        if(wrecked) {
+            asset = assets.generic_car[3];
+        }
+        asset.draw(target, this->position);
+    }
 }
 
 

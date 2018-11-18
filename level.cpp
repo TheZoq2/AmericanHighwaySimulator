@@ -81,12 +81,16 @@ void Level::update(float delta_time) {
         on_player_collision_with_car(collision.p, collision.car);
     }
 
+    car_on_car_collision();
+
     update_and_spawn_powerups(delta_time);
     update_players_handle_input(delta_time);
 }
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        player.shake_left -= delta_time;
+
         if (player.powerup != nullptr) {
             player.powerup->angle += POWERUP_ANGLE_SPEED*delta_time;
         }
@@ -188,13 +192,42 @@ void Level::add_player(Player& player) {
 
 
 void Level::spawn_car() {
-    auto lane = random() % lane_amount;
-    // +0.5 to put the car in the center of the lane rather than on the side
-    auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
-
     auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
+    auto seed = random() % 100;
+    if(seed > 40) {
+        auto type = VehicleType::CAR;
+        if(seed > 90) {
+            type = VehicleType::MOTORBIKE;
+        }
+        else if(seed > 80) {
+            type = VehicleType::TRUCK;
+        }
+        auto lane = random() % lane_amount;
+        // +0.5 to put the car in the center of the lane rather than on the side
+        auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
 
-    this->cars.push_back(Car(sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset)));
+        this->cars.push_back(
+            Car(type, sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset))
+        );
+    }
+    else {
+        auto range = (WINDOW_WIDTH - road_width);
+        auto position = (random() % range) - range/2;
+
+        if(position > 0) {
+            position += road_width / 2 + ROCK_SIZE / 2;
+        }
+        else {
+            position -= road_width / 2 + ROCK_SIZE / 2;
+        }
+
+        position += WINDOW_CENTER;
+
+        this->cars.push_back(Car(
+            VehicleType::ROCK,
+            sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset)
+        ));
+    }
 }
 
 void Level::add_lane(int lane_num) {
@@ -220,31 +253,44 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
 }
 
 void Level::on_player_collision_with_car(Player* p, Car* c) {
+    // Shake the player for a short time
+    if(c->type == VehicleType::ROCK) {
+        p->wrecked = true;
+    }
     if(p->collidee != c) {
         p->collidee = c;
         p->persistent_acceleration.x +=
             (random() % COLLISION_MAX_BREAKAGE) - COLLISION_MAX_BREAKAGE / 2;
-        p->health -= COLLISION_DAMAGE;
+
+        if(c->type != VehicleType::MOTORBIKE) {
+            // Update health
+            p->health -= COLLISION_DAMAGE;
+
+            // Bounce
+            float sign = -1;
+            if(p->position.x > c->position.x) {
+                sign = 1;
+            }
+            p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
+            std::cout << p->velocity.x << std::endl;
+        }
+        else {
+            // shake the car a bit since you ran over someone
+            p->shake_left = 0.25;
+        }
 
         if(p->health < 0) {
             p->wrecked = true;
         }
         // p->wrecked = true;
-        c->wrecked = true;
-
-        float sign = -1;
-        if(p->position.x > c->position.x) {
-            sign = 1;
+        if(c->type != VehicleType::TRUCK) {
+            c->wrecked = true;
         }
-        p->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1;
-        std::cout << p->velocity.x << std::endl;
     }
 }
 
 CarCollisionResult Level::check_car_collisions() {
-
     for (auto& player : players) {
-        bool collided = false;
         for (auto& car : cars) {
             float px = player.position.x;
             float py = player.position.y;
@@ -358,3 +404,36 @@ void Level::activate_transparency_powerup(Player* p) {
     std::cout << "Transparency!" << std::endl;
 }
 
+
+void Level::car_on_car_collision() {
+    for(auto& car : cars) {
+        for(auto& other: cars) {
+            std::cout << car.position.x << " " << other.position.x << std::endl;
+            // If these are the same cars or they are not in the same lane
+            if( car.position.y == other.position.y 
+                || car.position.x != other.position.x
+                // || car.wrecked
+              )
+            {
+                break;
+            }
+
+            std::cout << "Running" << std::endl;
+            auto distance = other.position.y - car.position.y;
+
+            if(distance < (car.height + other.height) / 2) {
+                // The cars are colliding, respawn this one
+                auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
+
+                car.position.y = CAR_SPAWN_Y - spawn_offset;
+
+                std::cout << "collision" << std::endl;
+            }
+            else if(distance < car.height + other.height) {
+                // This one is catching up, slow down
+                car.velocity = other.velocity;
+                std::cout << "almost collision" << std::endl;
+            }
+        }
+    }
+}

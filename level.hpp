@@ -82,6 +82,7 @@ private:
     
     void activate_sleepy_powerup(Player* p);
     void activate_transparency_powerup(Player* p);
+    void car_on_car_collision();
 };
 
 #endif /* ifndef LEVEL_H */

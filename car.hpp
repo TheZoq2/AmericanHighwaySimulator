@@ -31,9 +31,9 @@ public:
 
     float velocity;
 
+    VehicleType type;
 private:
     
-    VehicleType type;
 
 };
 
