@@ -41,5 +41,6 @@ public:
     Asset tractor[2];
     Asset bmv;
     Asset crosshair;
+    Asset inverted;
 };
 #endif
