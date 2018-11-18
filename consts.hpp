@@ -8,7 +8,7 @@ const int WINDOW_CENTER = WINDOW_WIDTH / 2;
 
 
 // Game parameters
-const int CAR_AMOUNT = 14;
+const int CAR_AMOUNT = 1;
 const int LANE_WIDTH = 200;
 const int CAR_SPAWN_Y = -300;
 const int CAR_DESPAWN_Y = WINDOW_HEIGHT - CAR_SPAWN_Y;
@@ -29,7 +29,7 @@ const float PLAYER_ACCELERATION_X = 1000;
 const float PLAYER_ACCELERATION_Y = 600;
 const float PLAYER_ACCELERATION_Y_DOWN = 1000;
 const float PLAYER_MAX_VEL_X = 500;
-const float PLAYER_OFFROAD_ACC_RETARDATION = 0.6;
+const float PLAYER_OFFROAD_ACC_RETARDATION = 200;
 const float PLAYER_OFFROAD_VEL_RETARDATION = 70;
 const float PLAYER_MAX_VEL_Y = 700;
 
