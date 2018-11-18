@@ -12,7 +12,18 @@ Asset::Asset(std::string path) {
     this->sprite.setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
 }
 
+SoundAsset::SoundAsset(std::string path) {
+    if(!this->buffer.loadFromFile(path)) {
+        std::cout << "Failed to load sound " << path << std::endl;
+        exit(-1);
+    }
+}
 
+sf::Sound* SoundAsset::get_sound() {
+    sf::Sound* sound = new sf::Sound;
+    sound->setBuffer(this->buffer);
+    return sound;
+}
 
 
 void Asset::draw(sf::RenderTarget* target, sf::Vector2f position) {
@@ -82,7 +93,29 @@ Assets::Assets() :
     police_lights{
         Asset("../resources/police_lights_1.png"),
         Asset("../resources/police_lights_2.png"),
-    }
+    },
+    engine("../resources/audio/motor2.ogg"),
+    music("../American highway simulator.ogg"),
+    bmv_sound{
+        SoundAsset("../resources/audio/bmw.ogg"),
+        SoundAsset("../resources/audio/bmw_spak.ogg"),
+    },
+    bump{
+        SoundAsset("../resources/audio/bump1.ogg"),
+        SoundAsset("../resources/audio/bump2.ogg"),
+    },
+    crash{
+        SoundAsset("../resources/audio/crash1.ogg"),
+        SoundAsset("../resources/audio/crash2.ogg"),
+        SoundAsset("../resources/audio/crash3.ogg"),
+    },
+    macke("../resources/audio/macke.ogg"),
+    swear{
+        SoundAsset("../resources/audio/norsk.ogg"),
+        SoundAsset("../resources/audio/wanker.ogg"),
+    },
+    siren("../resources/audio/siren.ogg"),
+    powerup_sound("../resources/audio/powerup.ogg")
 {
     lane.set_origin(0,0);
 

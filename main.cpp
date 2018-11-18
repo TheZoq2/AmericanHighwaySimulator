@@ -55,7 +55,7 @@ int main() {
 
         if(!player_selection.done) {
             player_selection.draw(&window, assets);
-            player_selection.run();
+            player_selection.run(assets);
             level.reset_players();
             level.reset_cars();
             is_game_over = false;

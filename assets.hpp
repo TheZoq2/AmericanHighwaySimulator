@@ -2,6 +2,7 @@
 #define H_ASSETS
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <string>
 
 #include "consts.hpp"
@@ -20,6 +21,15 @@ public:
 
     sf::Texture texture;
     sf::Sprite sprite;
+};
+
+class SoundAsset {
+public:
+    SoundAsset(std::string path);
+    sf::Sound* get_sound();
+
+private:
+    sf::SoundBuffer buffer;
 };
 
 class Assets {
@@ -45,5 +55,15 @@ public:
     Asset inverted;
     Asset police;
     Asset police_lights[2];
+
+    SoundAsset engine;
+    SoundAsset music;
+    SoundAsset bmv_sound[2];
+    SoundAsset bump[2];
+    SoundAsset crash[3];
+    SoundAsset macke;
+    SoundAsset swear[2];
+    SoundAsset siren;
+    SoundAsset powerup_sound;
 };
 #endif
