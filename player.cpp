@@ -67,6 +67,16 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         c
     );
 
+    if (this->is_sleepy()) {
+        sf::Vector2f position = this->position;
+        assets.sleep.draw(target, position);
+    }
+
+    if (this->is_inverted()) {
+        sf::Vector2f position = this->position;
+        assets.inverted.draw(target, position);
+    }
+
     if (this->powerup != nullptr) {
         sf::Vector2f powerup_pos = this->position + 
             sf::Vector2f{0, PLAYER_HEIGHT*0.7};
