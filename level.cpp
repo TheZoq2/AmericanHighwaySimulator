@@ -201,10 +201,10 @@ void Level::spawn_car() {
         auto position = (random() % range) - range/2;
 
         if(position > 0) {
-            position += road_width / 2;
+            position += road_width / 2 + ROCK_SIZE / 2;
         }
         else {
-            position -= road_width / 2;
+            position -= road_width / 2 + ROCK_SIZE / 2;
         }
 
         position += WINDOW_CENTER;

@@ -12,6 +12,9 @@ Car::Car(VehicleType type, sf::Vector2f position) {
     // TODO FIXME TODO FIXME TODO FIXME TODO FIXME TODO FIXME TODO FIXME 
     this->width = PLAYER_WIDTH;
     this->height = PLAYER_HEIGHT;
+    if(type == VehicleType::ROCK) {
+        this->width = this->height = ROCK_SIZE;
+    }
     this->wrecked = false;
 
     if(type == VehicleType::ROCK) {
