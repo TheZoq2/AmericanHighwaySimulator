@@ -60,7 +60,7 @@ void PlayerSelection::run() {
         }
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return) && players.size() > 0) {
         done = true;
     }
 }
