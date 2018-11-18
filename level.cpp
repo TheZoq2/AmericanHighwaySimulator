@@ -38,6 +38,11 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
 
 
 void Level::update(float delta_time) {
+    if(get_players_left() < 1) {
+        std::cout << "No players left " << game_over_timeout << std::endl;
+        game_over_timeout -= delta_time;
+    }
+
     check_if_players_within_bounds();
     // Update lanes
     for (auto& lane : lanes) {
@@ -587,6 +592,7 @@ void Level::update_target_selection(Player* p, float delta_time) {
 
 
 void Level::car_on_car_collision() {
+    /*
     for(auto& car : cars) {
         for(auto& other: cars) {
             // If these are the same cars or they are not in the same lane
@@ -607,6 +613,7 @@ void Level::car_on_car_collision() {
             }
         }
     }
+    */
 }
 
 int Level::get_players_left() {

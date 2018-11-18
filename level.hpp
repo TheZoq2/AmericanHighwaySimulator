@@ -33,6 +33,8 @@ public:
     void reset_players();
     void reset_cars();
 
+    float game_over_timeout = 3;
+
 private:
 
     void update_players_handle_input(float delta_time);
@@ -76,6 +78,7 @@ private:
     int road_width;
 
     bool someone_selecting = false;
+
 
     /////////////////////////////////////////
     // Powerups

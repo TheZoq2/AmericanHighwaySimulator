@@ -58,6 +58,7 @@ int main() {
             player_selection.run(assets);
             level.reset_players();
             level.reset_cars();
+            level.game_over_timeout = 3;
             is_game_over = false;
 
             if(player_selection.done) {
@@ -72,7 +73,7 @@ int main() {
                 }
             }
         }
-        else if (level.get_players_left() < 1 && !is_game_over) {
+        else if (level.game_over_timeout <= 0 && !is_game_over) {
             assets.game_over.set_origin(0,0);
             assets.game_over.draw(&window, sf::Vector2f(0,0));
 
