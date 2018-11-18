@@ -390,7 +390,8 @@ void Level::spawn_powerup() {
         type = static_cast<PowerUpType>(random() % NUM_POWERUPS);
 
     // only spawn non-attack powerups if only one person is playing
-    } while(type == PowerUpType::SLEEPY && players.size() == 1);
+    } while((type == PowerUpType::SLEEPY || type == PowerUpType::INVERTED)
+                && players.size() == 1);
 
     this->powerups.push_back(
             PowerUp {sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset), 

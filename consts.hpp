@@ -51,7 +51,7 @@ const float WRECK_RETARDATION = 2.;
 const float TARGET_SELECTION_TIME = 1;
 const float TARGET_SELECTION_ANGLE_SPEED = 100;
 
-const float SLEEPY_TIME = 2;
-const float INVERTED_TIME = 2;
+const float SLEEPY_TIME = 3;
+const float INVERTED_TIME = 3;
 
 #endif
