@@ -197,6 +197,9 @@ void Level::spawn_car() {
         if(seed > 90) {
             type = VehicleType::MOTORBIKE;
         }
+        else if(seed > 80) {
+            type = VehicleType::TRUCK;
+        }
         auto lane = random() % lane_amount;
         // +0.5 to put the car in the center of the lane rather than on the side
         auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
@@ -270,15 +273,17 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
             std::cout << p->velocity.x << std::endl;
         }
         else {
-            p->shake_left = 0.15;
+            // shake the car a bit since you ran over someone
+            p->shake_left = 0.25;
         }
 
         if(p->health < 0) {
             p->wrecked = true;
         }
         // p->wrecked = true;
-        c->wrecked = true;
-
+        if(c->type != VehicleType::TRUCK) {
+            c->wrecked = true;
+        }
     }
 }
 

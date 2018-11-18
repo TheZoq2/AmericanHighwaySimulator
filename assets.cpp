@@ -68,7 +68,8 @@ Assets::Assets() :
     motorcycle{
         Asset("../resources/motorcycle.png"),
         Asset("../resources/motorcycle_crashed.png"),
-    }
+    },
+    truck("../resources/truck.png")
 {
     lane.set_origin(0,0);
 }

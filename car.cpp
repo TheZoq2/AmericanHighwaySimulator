@@ -22,6 +22,10 @@ Car::Car(VehicleType type, sf::Vector2f position) {
         this->height = MOTORCYCLE_HEIGHT;
         this->velocity *= 1.4;
     }
+    if(type == VehicleType::TRUCK) {
+        this->height = TRUCK_HEIGHT;
+        this->velocity *= 0.7;
+    }
     this->wrecked = false;
 }
 
@@ -34,6 +38,10 @@ void Car::draw(sf::RenderTarget* target, Assets& assets) const {
         if(wrecked) {
             asset = assets.motorcycle[1];
         }
+        asset.draw(target, this->position);
+    }
+    else if(type == VehicleType::TRUCK) {
+        auto asset = assets.truck;
         asset.draw(target, this->position);
     }
     else {
@@ -52,4 +60,8 @@ void Car::update(float delta) {
     } else {
         this->position.y += delta * ROAD_SPEED;
     }
+}
+
+void Car::get_height() {
+    switch (this->type) {}
 }

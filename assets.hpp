@@ -37,5 +37,6 @@ public:
     Asset breaking;
     Asset outgas[3];
     Asset motorcycle[2];
+    Asset truck;
 };
 #endif
