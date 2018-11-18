@@ -61,7 +61,3 @@ void Car::update(float delta) {
         this->position.y += delta * ROAD_SPEED;
     }
 }
-
-void Car::get_height() {
-    switch (this->type) {}
-}
