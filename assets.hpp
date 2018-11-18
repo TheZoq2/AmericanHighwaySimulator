@@ -56,5 +56,13 @@ public:
     Asset police_lights[2];
 
     SoundAsset engine;
+    SoundAsset music;
+    SoundAsset bmv_sound[2];
+    SoundAsset bump[2];
+    SoundAsset crash[3];
+    SoundAsset macke;
+    SoundAsset swear[2];
+    SoundAsset siren;
+    SoundAsset powerup_sound;
 };
 #endif

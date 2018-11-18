@@ -94,6 +94,7 @@ void Level::update(float delta_time) {
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        player.update_engine_noise();
         update_target_selection(&player, delta_time);
         player.shake_left -= delta_time;
 

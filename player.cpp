@@ -28,10 +28,10 @@ bool Player::is_transparent() const {
 }
 
 void Player::update_engine_noise() {
-    float x = this->velocity.x;
     float y = this->velocity.y;
-    float speed = std::sqrt(x*x + y*y);
-    float factor = 1 + speed*ENGINE_PITCH_DIFF;
+    float speed = y - ROAD_SPEED;
+    float factor = 0.5 + speed*ENGINE_PITCH_DIFF/(PLAYER_MAX_VEL_Y - ROAD_SPEED);
+    this->engine_noise->setPitch(factor);
 }
 
 void Player::draw(sf::RenderTarget* target, Assets& assets) const {
