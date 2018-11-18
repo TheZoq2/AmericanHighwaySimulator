@@ -38,7 +38,7 @@ const float POWERUP_ANGLE_SPEED = 100;
 const int POWERUP_HEIGHT = 70;
 const int POWERUP_WIDTH = 70;
 const float POWERUP_BOUNCE_SPEED = 0.05;
-const float TRANSPARENCY_TIME = 1000;
+const float TRANSPARENCY_TIME = 3;
 const float TRANSPARENCY_BAR_HEIGHT = 10;
 const float TRANSPARENCY_OPACITY = 100;
 

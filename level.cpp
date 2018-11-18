@@ -103,7 +103,7 @@ void Level::update_players_handle_input(float delta_time) {
 
         // handle transparency
         if (player.is_transparent()) {
-            player.transparency_time--;
+            player.transparency_time -= delta_time;
         }
 
         float y_retardation = 1.;
@@ -413,28 +413,22 @@ void Level::activate_transparency_powerup(Player* p) {
 void Level::car_on_car_collision() {
     for(auto& car : cars) {
         for(auto& other: cars) {
-            std::cout << car.position.x << " " << other.position.x << std::endl;
             // If these are the same cars or they are not in the same lane
+
+            std::cout << "Running" << std::endl;
+            auto distance = car.position.y - other.position.y;
+
             if( car.position.y == other.position.y 
                 || car.position.x != other.position.x
+                || distance > 0
                 // || car.wrecked
               )
             {
                 break;
             }
+            std::cout << car.position.x << " " << other.position.x << std::endl;
 
-            std::cout << "Running" << std::endl;
-            auto distance = other.position.y - car.position.y;
-
-            if(distance < (car.height + other.height) / 2) {
-                // The cars are colliding, respawn this one
-                auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
-
-                car.position.y = CAR_SPAWN_Y - spawn_offset;
-
-                std::cout << "collision" << std::endl;
-            }
-            else if(distance < car.height + other.height) {
+            if(distance < (car.height + other.height)) {
                 // This one is catching up, slow down
                 car.velocity = other.velocity;
                 std::cout << "almost collision" << std::endl;
