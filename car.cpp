@@ -58,6 +58,7 @@ void Car::update(float delta) {
     if (!this->wrecked) {
         this->position.y += delta * velocity;
     } else {
-        this->position.y += delta * ROAD_SPEED;
+        this->velocity -= (this->velocity - ROAD_SPEED) * WRECK_RETARDATION * delta * 2;
+        this->position.y += delta * this->velocity;
     }
 }

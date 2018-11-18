@@ -97,7 +97,14 @@ void Level::update_players_handle_input(float delta_time) {
 
         // wrecked cars can't move
         if (player.wrecked) {
-            player.position.y += ROAD_SPEED*delta_time;
+            player.velocity.x -= (
+                player.velocity.x * WRECK_RETARDATION * delta_time
+            );
+            player.velocity.y -= (
+                (player.velocity.y - ROAD_SPEED) * WRECK_RETARDATION * delta_time
+            );
+            player.position += player.velocity * delta_time;
+            // player.position.y += ROAD_SPEED*delta_time;
             continue;
         }
 
@@ -414,8 +421,6 @@ void Level::car_on_car_collision() {
     for(auto& car : cars) {
         for(auto& other: cars) {
             // If these are the same cars or they are not in the same lane
-
-            std::cout << "Running" << std::endl;
             auto distance = car.position.y - other.position.y;
 
             if( car.position.y == other.position.y 
@@ -431,7 +436,6 @@ void Level::car_on_car_collision() {
             if(distance < (car.height + other.height)) {
                 // This one is catching up, slow down
                 car.velocity = other.velocity;
-                std::cout << "almost collision" << std::endl;
             }
         }
     }

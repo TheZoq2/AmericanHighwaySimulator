@@ -42,4 +42,6 @@ const float TRANSPARENCY_TIME = 3;
 const float TRANSPARENCY_BAR_HEIGHT = 10;
 const float TRANSPARENCY_OPACITY = 100;
 
+const float WRECK_RETARDATION = 0.8;
+
 #endif
