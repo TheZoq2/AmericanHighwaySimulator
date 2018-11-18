@@ -98,13 +98,20 @@ void Level::update_players_handle_input(float delta_time) {
 
         // wrecked cars can't move
         if (player.wrecked) {
-            player.position.y += ROAD_SPEED*delta_time;
+            player.velocity.x -= (
+                player.velocity.x * WRECK_RETARDATION * delta_time
+            );
+            player.velocity.y -= (
+                (player.velocity.y - ROAD_SPEED) * WRECK_RETARDATION * delta_time
+            );
+            player.position += player.velocity * delta_time;
+            // player.position.y += ROAD_SPEED*delta_time;
             continue;
         }
 
         // handle transparency
         if (player.is_transparent()) {
-            player.transparency_time--;
+            player.transparency_time -= delta_time;
         }
 
         float y_retardation = 1.;
@@ -473,24 +480,18 @@ void Level::car_on_car_collision() {
     for(auto& car : cars) {
         for(auto& other: cars) {
             // If these are the same cars or they are not in the same lane
+            auto distance = car.position.y - other.position.y;
+
             if( car.position.y == other.position.y 
                 || car.position.x != other.position.x
+                || distance > 0
                 // || car.wrecked
               )
             {
                 break;
             }
 
-            auto distance = other.position.y - car.position.y;
-
-            if(distance < (car.height + other.height) / 2) {
-                // The cars are colliding, respawn this one
-                auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
-
-                car.position.y = CAR_SPAWN_Y - spawn_offset;
-
-            }
-            else if(distance < car.height + other.height) {
+            if(distance < (car.height + other.height)) {
                 // This one is catching up, slow down
                 car.velocity = other.velocity;
             }
