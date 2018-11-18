@@ -48,6 +48,7 @@ public:
     Asset outgas[3];
     Asset motorcycle[2];
     Asset truck;
+    Asset game_over;
     Asset tractor[2];
     Asset bmv;
     Asset crosshair;

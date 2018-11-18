@@ -81,6 +81,7 @@ Assets::Assets() :
         Asset("../resources/motorcycle_crashed.png"),
     },
     truck("../resources/truck.png"),
+    game_over("../resources/game_over.png"),
     tractor{
         Asset("../resources/tractor.png"),
         Asset("../resources/tractor_broken.png")

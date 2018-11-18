@@ -603,3 +603,21 @@ void Level::car_on_car_collision() {
         }
     }
 }
+
+int Level::get_players_left() {
+    int cars_alive = 0;
+    for (auto& player : players) {
+        if (!player.wrecked) {
+            cars_alive++;
+        }
+    }
+    return cars_alive;
+}
+
+void Level::reset_players() {
+    players.clear();
+}
+
+void Level::reset_cars() {
+    cars.clear();
+}

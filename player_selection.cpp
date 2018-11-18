@@ -75,4 +75,3 @@ void PlayerSelection::add_player(input::InputHandler* handler, Assets& assets) {
     ));
     spawn_x += 300;
 }
-
