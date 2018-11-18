@@ -21,11 +21,11 @@ class Level {
 
 public:
 
-    Level(int num_lanes);
+    Level(int num_lanes, Assets& assets);
     ~Level();
 
     void draw(sf::RenderTarget* target, Assets& assets) const;
-    void update(float delta);
+    void update(float delta, Assets& assets);
 
     void add_player(Player& player);
 
@@ -33,10 +33,12 @@ public:
     void reset_players();
     void reset_cars();
 
+    float game_over_timeout = 3;
+
 private:
 
     void update_players_handle_input(float delta_time);
-    void spawn_car();
+    void spawn_car(Assets& assets);
     void add_lane(int lane_num);
 
     void spawn_powerup();
@@ -58,13 +60,16 @@ private:
 
     void on_player_collision_with_other(Player* collider, Player* collided);
 
-    void on_player_collision_with_car(Player* p, Car* c);
+    void on_player_collision_with_car(Player* p, Car* c, Assets& assets);
 
     void check_if_players_within_bounds();
 
     void update_player_status(sf::RenderTarget* target, Assets& assets);
 
     int num_lanes;
+
+    sf::Sound* macke;
+    sf::Sound* police;
 
     std::vector<Car> cars;
     std::vector<PowerUp> powerups;
@@ -76,6 +81,7 @@ private:
     int road_width;
 
     bool someone_selecting = false;
+
 
     /////////////////////////////////////////
     // Powerups

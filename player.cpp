@@ -18,6 +18,7 @@ Player::Player(
     this->persistent_acceleration = sf::Vector2f(0, 0);
     this->engine_noise = assets.engine.get_sound();
     this->engine_noise->setLoop(true);
+    this->engine_noise->setVolume(70.f);
     this->engine_noise->play();
 
     new_color();

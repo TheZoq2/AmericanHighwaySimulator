@@ -31,8 +31,8 @@ int main() {
 
     srand(time(NULL));
 
-    Level level(5);
     Assets assets;
+    Level level(5, assets);
 
     PlayerSelection player_selection;
 
@@ -58,6 +58,7 @@ int main() {
             player_selection.run(assets);
             level.reset_players();
             level.reset_cars();
+            level.game_over_timeout = 3;
             is_game_over = false;
 
             if(player_selection.done) {
@@ -72,11 +73,11 @@ int main() {
                 }
             }
         }
-        else if (level.get_players_left() < 1 && !is_game_over) {
+        else if (level.game_over_timeout <= 0 && !is_game_over) {
             assets.game_over.set_origin(0,0);
             assets.game_over.draw(&window, sf::Vector2f(0,0));
 
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace) && player_selection.done) {
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace) && player_selection.done) {
                 player_selection.done = false;
             }
         }
@@ -103,7 +104,7 @@ int main() {
             window.draw(bg_sprite);
             window.draw(bg_sprite_second);
 
-            level.update(next_time_step);
+            level.update(next_time_step, assets);
 
             level.draw(&window, assets);
         }
