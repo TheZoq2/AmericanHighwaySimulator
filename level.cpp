@@ -145,26 +145,36 @@ void Level::update_players_handle_input(float delta_time) {
             acceleration *= BMV_ACC_MODIFIER;
         }
 
+        auto sign = 1;
         if (player.is_inverted()) {
+            sign = -1;
             acceleration *= (float)-1.0;
+        }
+
+        auto extra_performance = 1.0;
+        if(player.bmv_time > 0) {
+            extra_performance = 1.7;
         }
 
         auto target_y_velocity =
             ( player.input_handler->get_value(input::Action::DOWN)
             - player.input_handler->get_value(input::Action::UP)
             )
-            * PLAYER_MAX_VEL_Y;
+            * PLAYER_MAX_VEL_Y * sign * extra_performance;
         auto target_x_velocity =
             ( player.input_handler->get_value(input::Action::RIGHT)
             - player.input_handler->get_value(input::Action::LEFT)
             )
-            * PLAYER_MAX_VEL_X;
+            * PLAYER_MAX_VEL_X * sign * extra_performance;
 
         if (!player.is_sleepy()) {
             // player.velocity.x += acceleration.x;
-            std::cout << player.velocity.x << std::endl;
+            player.velocity.y += (target_y_velocity - player.velocity.y) * 0.03 * extra_performance;
+            player.velocity.x += (target_x_velocity - player.velocity.x) * 0.04 *extra_performance;
+        }
+        else {
+            target_y_velocity = 0;
             player.velocity.y += (target_y_velocity - player.velocity.y) * 0.03;
-            player.velocity.x += (target_x_velocity - player.velocity.x) * 0.03;
         }
 
         update_sleepiness(&player, delta_time);
