@@ -21,6 +21,7 @@ public:
     void set_powerup(PowerUp* p);
     void new_color();
 
+
     std::string name;
     sf::Vector2f position;
     Player* just_collided_with;
@@ -42,6 +43,8 @@ public:
     float transparency_time = 0;
 
 private:
+    void draw_lights(sf::RenderTarget* target, float visual_angle, Assets& assets) const;
+
     float r, g, b;
 
 };

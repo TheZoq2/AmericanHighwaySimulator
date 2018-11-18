@@ -1,6 +1,7 @@
 #include "player.hpp"
 
 #include <math.h>
+#include <chrono>
 
 Player::Player(
     std::string name,
@@ -31,7 +32,6 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
     else if(health < 75) {
         asset = assets.generic_car[1];
     }
-
     sf::Color c;
     if (this->transparency_time > 0) {
         c = sf::Color(r, g, b, TRANSPARENCY_OPACITY);
@@ -62,6 +62,8 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         transparency_bar.setFillColor(sf::Color{50, 50, 255, 255});
         target->draw(transparency_bar);
     }
+
+    this->draw_lights(target, visual_angle, assets);
 }
 
 void Player::set_powerup(PowerUp* p) {
@@ -76,4 +78,46 @@ void Player::new_color() {
     r = random() % 255;
     g = random() % 255;
     b = random() % 255;
+}
+
+void Player::draw_lights(
+    sf::RenderTarget* target,
+    float visual_angle,
+    Assets& assets
+) const {
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds> (
+            std::chrono::system_clock::now().time_since_epoch()
+        );
+
+    if(ms.count() % 500 > 250) {
+        if (this->velocity.x > 0.2 * PLAYER_MAX_VEL_X) {
+            assets.turn_right.draw(
+                target,
+                this->position,
+                visual_angle
+            );
+        }
+        if (this->velocity.x < -0.2 * PLAYER_MAX_VEL_X) {
+            assets.turn_left.draw(
+                target,
+                this->position,
+                visual_angle
+            );
+        }
+    }
+    if (this->input_handler->get_value(input::Action::DOWN) > 0.2) {
+        assets.breaking.draw(
+            target,
+            this->position,
+            visual_angle
+        );
+    }
+
+    if(this->input_handler->get_value(input::Action::UP) > 0.3) {
+        assets.outgas[ms.count() / 100 % 3].draw(
+            target,
+            this->position,
+            visual_angle
+        );
+    }
 }

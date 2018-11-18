@@ -32,5 +32,9 @@ public:
     Asset sleep;
     Asset transparency;
     Asset rock;
+    Asset turn_left;
+    Asset turn_right;
+    Asset breaking;
+    Asset outgas[3];
 };
 #endif
