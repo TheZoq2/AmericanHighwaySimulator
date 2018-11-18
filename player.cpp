@@ -62,17 +62,23 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         this->powerup->draw_mini(target, assets, powerup_pos);
     }
 
-    if (this->is_transparent() || this->bmv_time > 0) {
+    if (this->is_transparent() || this->is_bmv() || this->is_sleepy()) {
         float amount = this->transparency_time/TRANSPARENCY_TIME;
-        if(this->bmv_time > 0) {
+        if(this->is_bmv()) {
             amount = this->bmv_time/BMV_TIME;
+        } else if (this->is_sleepy()) {
+            amount = this->sleepy_time/SLEEPY_TIME;
         }
         sf::RectangleShape transparency_bar
             {sf::Vector2f{amount*PLAYER_WIDTH, TRANSPARENCY_BAR_HEIGHT}};
         sf::Vector2f bar_pos = this->position + 
             sf::Vector2f{-PLAYER_WIDTH/2, PLAYER_HEIGHT*0.7};
         transparency_bar.setPosition(bar_pos);
-        transparency_bar.setFillColor(sf::Color{50, 50, 255, 255});
+        if (this->is_sleepy()) {
+            transparency_bar.setFillColor(sf::Color{255, 0, 0, 255});
+        } else {
+            transparency_bar.setFillColor(sf::Color{50, 50, 255, 255});
+        }
         target->draw(transparency_bar);
     }
 
@@ -98,6 +104,13 @@ void Player::set_powerup(PowerUp* p) {
     this->powerup = p;
 }
 
+bool Player::is_sleepy() const {
+    return sleepy_time > 0;
+}
+
+bool Player::is_bmv() const {
+    return bmv_time > 0;
+}
 
 void Player::new_color() {
     r = random() % 255;
@@ -114,7 +127,7 @@ void Player::draw_lights(
             std::chrono::system_clock::now().time_since_epoch()
         );
 
-    if(ms.count() % 500 > 250 && bmv_time < 0) {
+    if(ms.count() % 500 > 250 && !is_bmv()) {
         if (this->velocity.x > 0.2 * PLAYER_MAX_VEL_X) {
             assets.turn_right.draw(
                 target,

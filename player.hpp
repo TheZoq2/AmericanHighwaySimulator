@@ -22,6 +22,8 @@ public:
     void new_color();
 
     bool is_transparent() const;
+    bool is_sleepy() const;
+    bool is_bmv() const;
 
     std::string name;
     sf::Vector2f position;
@@ -50,8 +52,11 @@ public:
     bool target_selected = false;
     float selection_time = 0;
 
+    float sleepy_time = 0;
+
     Player* selected_by = nullptr;
     size_t selected_target_index;
+    bool already_entered_selection = false;
 
     float r, g, b;
 private:

@@ -145,7 +145,11 @@ void Level::update_players_handle_input(float delta_time) {
             acceleration *= BMV_ACC_MODIFIER;
         }
 
-        player.velocity += acceleration;
+        if (!player.is_sleepy()) {
+            player.velocity += acceleration;
+        } else {
+            update_sleepiness(&player, delta_time);
+        }
 
         if (player.velocity.x > PLAYER_MAX_VEL_X) {
             player.velocity.x = PLAYER_MAX_VEL_X;
@@ -170,8 +174,16 @@ void Level::update_players_handle_input(float delta_time) {
         player.just_collided_with = collided;
 
         if (player.input_handler->get_value(input::Action::FIRE) &&
-            player.powerup != nullptr) {
-            fire_player_powerup(&player);
+                !player.is_sleepy() &&
+                !player.is_bmv() &&
+                !player.is_transparent() &&
+            (player.powerup != nullptr || player.selection_mode)) {
+            if (!player.already_entered_selection) {
+                fire_player_powerup(&player);
+            }
+            player.already_entered_selection = true;
+        } else if (player.already_entered_selection) {
+            player.already_entered_selection = false;
         }
     }
 }
@@ -399,7 +411,8 @@ void Level::update_and_spawn_powerups(float delta_time) {
         PowerUp* powerup = &powerups[i];
         for (auto& player : players) {
             if (powerup_collides_with_player(powerup, &player) &&
-                !player.selection_mode) {
+                !player.selection_mode &&
+                !player.is_sleepy()) {
                 // copy the powerup to the player
                 PowerUp* p = new PowerUp(*powerup);
                 player.set_powerup(p);
@@ -419,6 +432,10 @@ bool Level::powerup_collides_with_player(PowerUp* pu, Player* p) const {
 }
 
 void Level::fire_player_powerup(Player* p) {
+    if (p->powerup == nullptr) {
+        activate_sleepy_powerup(p);
+        return;
+    }
     switch (p->powerup->type) {
         case PowerUpType::SLEEPY:
             activate_sleepy_powerup(p);
@@ -435,11 +452,14 @@ void Level::fire_player_powerup(Player* p) {
 }
 
 void Level::actually_fire_sleepy_powerup(Player* p) {
-    
+    size_t index = p->selected_target_index;
+    Player* target = &players[index];
+    target->sleepy_time = SLEEPY_TIME;
 }
 
 void Level::activate_sleepy_powerup(Player* p) {
     if (p->selection_mode) {
+        std::cout << "Sleepy!" << std::endl;
         deactivate_target_selection(p);
         actually_fire_sleepy_powerup(p);
     } else {
@@ -447,7 +467,10 @@ void Level::activate_sleepy_powerup(Player* p) {
             activate_target_selection(p);
         }
     }
-    std::cout << "Sleepy!" << std::endl;
+}
+
+void Level::update_sleepiness(Player* p, float delta_time) {
+    p->sleepy_time -= delta_time;
 }
 
 void Level::activate_transparency_powerup(Player* p) {
