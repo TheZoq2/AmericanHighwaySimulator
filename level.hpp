@@ -29,6 +29,10 @@ public:
 
     void add_player(Player& player);
 
+    int get_players_left();
+    void reset_players();
+    void reset_cars();
+
 private:
 
     void update_players_handle_input(float delta_time);
