@@ -209,6 +209,9 @@ void Level::spawn_car() {
         else if(seed > 80) {
             type = VehicleType::TRUCK;
         }
+        else if(seed > 70) {
+            type = VehicleType::TRACTOR;
+        }
         auto lane = random() % lane_amount;
         // +0.5 to put the car in the center of the lane rather than on the side
         auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
