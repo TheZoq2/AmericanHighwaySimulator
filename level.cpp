@@ -53,7 +53,7 @@ void Level::update(float delta_time) {
     std::vector<Car> new_cars;
     std::copy_if(cars.begin(), cars.end(), std::back_inserter(new_cars), [&](auto car) {
         if(car.type == VehicleType::POLICE) {
-            return car.position.y > 100;
+            return car.position.y > -500;
         }
         else {
             return car.position.y < WINDOW_HEIGHT * 2;
@@ -149,8 +149,22 @@ void Level::update_players_handle_input(float delta_time) {
             acceleration *= (float)-1.0;
         }
 
+        auto target_y_velocity =
+            ( player.input_handler->get_value(input::Action::DOWN)
+            - player.input_handler->get_value(input::Action::UP)
+            )
+            * PLAYER_MAX_VEL_Y;
+        auto target_x_velocity =
+            ( player.input_handler->get_value(input::Action::RIGHT)
+            - player.input_handler->get_value(input::Action::LEFT)
+            )
+            * PLAYER_MAX_VEL_X;
+
         if (!player.is_sleepy()) {
-            player.velocity += acceleration;
+            // player.velocity.x += acceleration.x;
+            std::cout << player.velocity.x << std::endl;
+            player.velocity.y += (target_y_velocity - player.velocity.y) * 0.03;
+            player.velocity.x += (target_x_velocity - player.velocity.x) * 0.03;
         }
 
         update_sleepiness(&player, delta_time);
