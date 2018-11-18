@@ -31,8 +31,8 @@ int main() {
 
     srand(time(NULL));
 
-    Level level(5);
     Assets assets;
+    Level level(5, assets);
 
     PlayerSelection player_selection;
 
@@ -76,7 +76,7 @@ int main() {
             assets.game_over.set_origin(0,0);
             assets.game_over.draw(&window, sf::Vector2f(0,0));
 
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace) && player_selection.done) {
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSpace) && player_selection.done) {
                 player_selection.done = false;
             }
         }
@@ -103,7 +103,7 @@ int main() {
             window.draw(bg_sprite);
             window.draw(bg_sprite_second);
 
-            level.update(next_time_step);
+            level.update(next_time_step, assets);
 
             level.draw(&window, assets);
         }
