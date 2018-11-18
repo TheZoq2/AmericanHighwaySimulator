@@ -2,14 +2,18 @@
 
 #include "consts.hpp"
 
-Car::Car(sf::Vector2f position) : Car(VehicleType::CAR, position){}
-Car::Car(VehicleType type, sf::Vector2f position) {
+Car::Car(sf::Vector2f position, Assets& assets) : 
+    Car(VehicleType::CAR, position, assets){}
+Car::Car(VehicleType type, sf::Vector2f position, Assets& assets) {
     this->type = type;
     this->position = position;
 
-    // TODO FIXME TODO FIXME TODO FIXME TODO FIXME TODO FIXME TODO FIXME 
-    // Change these
-    // TODO FIXME TODO FIXME TODO FIXME TODO FIXME TODO FIXME TODO FIXME 
+    if (type == VehicleType::POLICE) {
+        this->sound = assets.siren.get_sound();
+        this->sound->setVolume(90.f);
+        this->sound->play();
+    }
+
     this->width = PLAYER_WIDTH;
     this->height = PLAYER_HEIGHT;
     this->velocity = CAR_SPEED + (random() % CAR_SPEED_VARIATION);

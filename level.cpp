@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <cmath>
 
-Level::Level(int num_lanes) {
+Level::Level(int num_lanes, Assets& assets) {
     this->num_lanes = num_lanes;
 
     this->road_width = lane_amount * LANE_WIDTH;
@@ -14,6 +14,10 @@ Level::Level(int num_lanes) {
 
     sf::Sprite bg_sprite;
     bg_sprite.setTexture(bg_texture);
+
+    this->police = assets.siren.get_sound();
+    this->macke = assets.macke.get_sound();
+
 }
 
 Level::~Level() { }
@@ -37,7 +41,12 @@ void Level::draw(sf::RenderTarget* target, Assets& assets) const {
 }
 
 
-void Level::update(float delta_time) {
+void Level::update(float delta_time, Assets& assets) {
+    if(get_players_left() < 1) {
+        std::cout << "No players left " << game_over_timeout << std::endl;
+        game_over_timeout -= delta_time;
+    }
+
     check_if_players_within_bounds();
     // Update lanes
     for (auto& lane : lanes) {
@@ -53,7 +62,7 @@ void Level::update(float delta_time) {
     std::vector<Car> new_cars;
     std::copy_if(cars.begin(), cars.end(), std::back_inserter(new_cars), [&](auto car) {
         if(car.type == VehicleType::POLICE) {
-            return car.position.y > -500;
+            return car.position.y > -500 && car.position.y < WINDOW_HEIGHT * 3;
         }
         else {
             return car.position.y < WINDOW_HEIGHT * 2;
@@ -64,7 +73,7 @@ void Level::update(float delta_time) {
 
     // Spawn new cars
     while(cars.size() < CAR_AMOUNT) {
-        spawn_car();
+        spawn_car(assets);
     }
 
     // Filter removed lanes
@@ -83,7 +92,7 @@ void Level::update(float delta_time) {
 
     CarCollisionResult collision = check_car_collisions();
     if (collision.collision_occurred) {
-        on_player_collision_with_car(collision.p, collision.car);
+        on_player_collision_with_car(collision.p, collision.car, assets);
     }
 
     car_on_car_collision();
@@ -94,6 +103,7 @@ void Level::update(float delta_time) {
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        player.update_engine_noise();
         update_target_selection(&player, delta_time);
         player.shake_left -= delta_time;
 
@@ -120,51 +130,55 @@ void Level::update_players_handle_input(float delta_time) {
         }
         player.bmv_time -= delta_time;
 
-        float y_retardation = 1.;
-        if (is_offroad(player.position, PLAYER_WIDTH)) {
-            y_retardation = PLAYER_OFFROAD_ACC_RETARDATION;
-            player.position.y += PLAYER_OFFROAD_VEL_RETARDATION*delta_time;
-        }
-
         int dx{0}, dy{0};
         dy += PLAYER_ACCELERATION_Y_DOWN
-            * player.input_handler->get_value(input::Action::DOWN)
-            * (1/y_retardation);
+            * player.input_handler->get_value(input::Action::DOWN);
         dy -= PLAYER_ACCELERATION_Y
-            * player.input_handler->get_value(input::Action::UP)
-            * y_retardation;
+            * player.input_handler->get_value(input::Action::UP);
         dx -= PLAYER_ACCELERATION_X
             * player.input_handler->get_value(input::Action::LEFT);
         dx += PLAYER_ACCELERATION_X
             * player.input_handler->get_value(input::Action::RIGHT);
 
-        sf::Vector2f acceleration(dx, dy);
-        acceleration += player.persistent_acceleration;
-        acceleration *= delta_time;
-        if(player.bmv_time > 0) {
-            acceleration *= BMV_ACC_MODIFIER;
+
+        auto sign = 1;
+        if (player.is_inverted()) {
+            sign = -1;
         }
 
-        if (player.is_inverted()) {
-            acceleration *= (float)-1.0;
+        auto extra_performance = 1.0;
+        if(player.bmv_time > 0) {
+            extra_performance = 1.7;
         }
 
         auto target_y_velocity =
             ( player.input_handler->get_value(input::Action::DOWN)
             - player.input_handler->get_value(input::Action::UP)
             )
-            * PLAYER_MAX_VEL_Y;
+            * PLAYER_MAX_VEL_Y
+            * sign
+            * extra_performance;
         auto target_x_velocity =
             ( player.input_handler->get_value(input::Action::RIGHT)
             - player.input_handler->get_value(input::Action::LEFT)
             )
-            * PLAYER_MAX_VEL_X;
+            * PLAYER_MAX_VEL_X
+            * sign
+            * extra_performance
+            + player.persistent_acceleration.x;
+
+        if (is_offroad(player.position, PLAYER_WIDTH)) {
+            target_y_velocity += PLAYER_MAX_VEL_Y / 2;
+        }
 
         if (!player.is_sleepy()) {
             // player.velocity.x += acceleration.x;
-            std::cout << player.velocity.x << std::endl;
+            player.velocity.y += (target_y_velocity - player.velocity.y) * 0.03 * extra_performance;
+            player.velocity.x += (target_x_velocity - player.velocity.x) * 0.04 *extra_performance;
+        }
+        else {
+            target_y_velocity = 0;
             player.velocity.y += (target_y_velocity - player.velocity.y) * 0.03;
-            player.velocity.x += (target_x_velocity - player.velocity.x) * 0.03;
         }
 
         update_sleepiness(&player, delta_time);
@@ -239,7 +253,7 @@ void Level::add_player(Player& player) {
 ////////////////////////////////////////////////////////////////////////////////
 
 
-void Level::spawn_car() {
+void Level::spawn_car(Assets& assets) {
     auto spawn_offset = random() % CAR_SPAWN_MAX_OFFSET;
     auto seed = random() % 100;
     if(seed > 40) {
@@ -258,7 +272,7 @@ void Level::spawn_car() {
         auto position = WINDOW_CENTER - road_width / 2 + LANE_WIDTH * (lane + 0.5);
 
         this->cars.push_back(
-            Car(type, sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset))
+            Car(type, sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset), assets)
         );
     }
     else {
@@ -276,7 +290,7 @@ void Level::spawn_car() {
 
         this->cars.push_back(Car(
             VehicleType::ROCK,
-            sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset)
+            sf::Vector2f(position, CAR_SPAWN_Y - spawn_offset), assets
         ));
     }
 }
@@ -296,12 +310,12 @@ void Level::on_player_collision_with_other(Player* collider, Player* collided) {
     if(collider->position.x > collided->position.x) {
         sign = 1;
     }
-    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 0.1 - avg_velocity;
-    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 0.1 + avg_velocity;
+    collider->velocity.x = sign * PLAYER_MAX_VEL_X * 1 - avg_velocity;
+    collided->velocity.x = -sign * PLAYER_MAX_VEL_X * 1 + avg_velocity;
 
 }
 
-void Level::on_player_collision_with_car(Player* p, Car* c) {
+void Level::on_player_collision_with_car(Player* p, Car* c, Assets& assets) {
     // Shake the player for a short time
     if(c->type == VehicleType::ROCK) {
         p->wrecked = true;
@@ -338,8 +352,9 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
         if(c->type == VehicleType::MOTORBIKE) {
             sf::Vector2f position(c->position.x, POLICE_SPAWN_DISTANCE);
             this->cars.push_back(
-                Car(VehicleType::POLICE, position)
+                Car(VehicleType::POLICE, position, assets)
             );
+            this->macke->play();
         }
     }
 }
@@ -540,6 +555,7 @@ void Level::activate_inverted_powerup(Player* p) {
 
 void Level::activate_target_selection(Player* p) {
     this->someone_selecting = true;
+    this->selection_timeout = 4;
     size_t initial_index = 0; 
     if (&players[0] == p) {
         initial_index++;
@@ -560,7 +576,15 @@ void Level::deactivate_target_selection(Player* p) {
 }
 
 void Level::update_target_selection(Player* p, float delta_time) {
-    if (p->selection_mode) {
+    selection_timeout -= delta_time;
+    if (selection_timeout < 0) {
+        for(auto& player : players) {
+            if(player.selection_mode) {
+                deactivate_target_selection(&player);
+            }
+        }
+    }
+    else if (p->selection_mode) {
         if (p->selection_time > 0) {
             p->selection_time -= delta_time;
         } else {
@@ -582,6 +606,7 @@ void Level::update_target_selection(Player* p, float delta_time) {
 
 
 void Level::car_on_car_collision() {
+    /*
     for(auto& car : cars) {
         for(auto& other: cars) {
             // If these are the same cars or they are not in the same lane
@@ -602,4 +627,23 @@ void Level::car_on_car_collision() {
             }
         }
     }
+    */
+}
+
+int Level::get_players_left() {
+    int cars_alive = 0;
+    for (auto& player : players) {
+        if (!player.wrecked) {
+            cars_alive++;
+        }
+    }
+    return cars_alive;
+}
+
+void Level::reset_players() {
+    players.clear();
+}
+
+void Level::reset_cars() {
+    cars.clear();
 }

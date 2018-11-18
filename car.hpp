@@ -18,14 +18,16 @@ class Car {
 
 public:
 
-    Car(VehicleType type, sf::Vector2f position);
-    Car(sf::Vector2f position);
+    Car(VehicleType type, sf::Vector2f position, Assets& assets);
+    Car(sf::Vector2f position, Assets& assets);
 
     void draw(sf::RenderTarget* target, Assets& assets) const;
 
     void update(float delta);
 
     sf::Vector2f position;
+
+    sf::Sound* sound = nullptr;
 
     int width;
     int height;

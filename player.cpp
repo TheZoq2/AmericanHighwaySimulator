@@ -8,7 +8,7 @@
 Player::Player(
     std::string name,
     input::InputHandler* input_handler,
-    sf::Vector2f start_position
+    sf::Vector2f start_position, Assets& assets
 ) : name(name), position(start_position)
 {
     this->just_collided_with = nullptr;
@@ -16,12 +16,23 @@ Player::Player(
     this->wrecked = false;
     this->powerup = nullptr;
     this->persistent_acceleration = sf::Vector2f(0, 0);
+    this->engine_noise = assets.engine.get_sound();
+    this->engine_noise->setLoop(true);
+    this->engine_noise->setVolume(70.f);
+    this->engine_noise->play();
 
     new_color();
 }
 
 bool Player::is_transparent() const {
     return this->transparency_time > 0;
+}
+
+void Player::update_engine_noise() {
+    float y = this->velocity.y;
+    float speed = y - ROAD_SPEED;
+    float factor = 0.5 + speed*ENGINE_PITCH_DIFF/(PLAYER_MAX_VEL_Y - ROAD_SPEED);
+    this->engine_noise->setPitch(factor);
 }
 
 void Player::draw(sf::RenderTarget* target, Assets& assets) const {
@@ -55,6 +66,16 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         visual_angle,
         c
     );
+
+    if (this->is_sleepy()) {
+        sf::Vector2f position = this->position;
+        assets.sleep.draw(target, position);
+    }
+
+    if (this->is_inverted()) {
+        sf::Vector2f position = this->position;
+        assets.inverted.draw(target, position);
+    }
 
     if (this->powerup != nullptr) {
         sf::Vector2f powerup_pos = this->position + 
