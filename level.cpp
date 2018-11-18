@@ -53,7 +53,7 @@ void Level::update(float delta_time) {
     std::vector<Car> new_cars;
     std::copy_if(cars.begin(), cars.end(), std::back_inserter(new_cars), [&](auto car) {
         if(car.type == VehicleType::POLICE) {
-            return car.position.y > 100;
+            return car.position.y > -500;
         }
         else {
             return car.position.y < WINDOW_HEIGHT * 2;
