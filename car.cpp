@@ -8,11 +8,6 @@ Car::Car(VehicleType type, sf::Vector2f position, Assets& assets) {
     this->type = type;
     this->position = position;
 
-    if (type == VehicleType::POLICE) {
-        this->sound = assets.siren.get_sound();
-        this->sound->setVolume(70.f);
-        this->sound->play();
-    }
 
     this->width = PLAYER_WIDTH;
     this->height = PLAYER_HEIGHT;
@@ -69,7 +64,9 @@ void Car::draw(sf::RenderTarget* target, Assets& assets) const {
             // asset = assets.tractor[1];
         }
         asset.draw(target, this->position);
-        light.draw(target, this->position);
+        if(police_ready) {
+            light.draw(target, this->position);
+        }
     }
     else {
         auto asset = assets.generic_car[0];
@@ -81,7 +78,23 @@ void Car::draw(sf::RenderTarget* target, Assets& assets) const {
 }
 
 
-void Car::update(float delta) {
+void Car::update(float delta, Assets& assets) {
+    this->police_delay -= delta;
+    if(type == VehicleType::POLICE) {
+        if (police_delay < 0 && !police_ready) {
+            this->police_delay = 1000000;
+            this->sound = assets.siren.get_sound();
+            this->sound->setVolume(70.f);
+            this->sound->play();
+            this->police_ready = true;
+        }
+        if(police_ready) {
+            this->velocity = POLICE_SPEED;
+        }
+        else {
+            this->velocity = 0;
+        }
+    }
     if (!this->wrecked) {
         this->position.y += delta * velocity;
     } else {

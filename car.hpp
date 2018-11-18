@@ -23,7 +23,7 @@ public:
 
     void draw(sf::RenderTarget* target, Assets& assets) const;
 
-    void update(float delta);
+    void update(float delta, Assets& assets);
 
     sf::Vector2f position;
 
@@ -37,8 +37,8 @@ public:
 
     VehicleType type;
 private:
-    
-
+    float police_delay = 2;
+    bool police_ready = false;
 };
 
 #endif /* ifndef CAR_H */

@@ -57,7 +57,7 @@ void Level::update(float delta_time, Assets& assets) {
 
     // Update cars
     for(auto& car: cars) {
-        car.update(delta_time);
+        car.update(delta_time, assets);
     }
 
     // Filter removed cars
