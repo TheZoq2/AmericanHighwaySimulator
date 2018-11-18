@@ -52,7 +52,12 @@ void Level::update(float delta_time) {
     // Filter removed cars
     std::vector<Car> new_cars;
     std::copy_if(cars.begin(), cars.end(), std::back_inserter(new_cars), [&](auto car) {
-        return car.position.y < WINDOW_HEIGHT * 2;
+        if(car.type == VehicleType::POLICE) {
+            return car.position.y > 100;
+        }
+        else {
+            return car.position.y < WINDOW_HEIGHT * 2;
+        }
     });
 
     this->cars = new_cars;
@@ -297,6 +302,13 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
         // p->wrecked = true;
         if(c->type != VehicleType::TRUCK) {
             c->wrecked = true;
+        }
+
+        if(c->type == VehicleType::MOTORBIKE) {
+            sf::Vector2f position(c->position.x, POLICE_SPAWN_DISTANCE);
+            this->cars.push_back(
+                Car(VehicleType::POLICE, position)
+            );
         }
     }
 }

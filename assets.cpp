@@ -76,7 +76,15 @@ Assets::Assets() :
     },
     bmv("../resources/bmv.png"),
     crosshair("../resources/crosshair.png"),
-    inverted("../resources/inverted.png")
+    inverted("../resources/inverted.png"),
+    police("../resources/police.png"),
+    police_lights{
+        Asset("../resources/police_lights_1.png"),
+        Asset("../resources/police_lights_2.png"),
+    }
 {
     lane.set_origin(0,0);
+
+    police_lights[0].set_origin(0.5,1);
+    police_lights[1].set_origin(0.5,1);
 }
