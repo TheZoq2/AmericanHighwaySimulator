@@ -102,7 +102,7 @@ void Level::update_players_handle_input(float delta_time) {
         }
 
         // handle transparency
-        if (player.transparency_time > 0) {
+        if (player.is_transparent()) {
             player.transparency_time--;
         }
 
@@ -291,6 +291,11 @@ void Level::on_player_collision_with_car(Player* p, Car* c) {
 
 CarCollisionResult Level::check_car_collisions() {
     for (auto& player : players) {
+
+        if (player.is_transparent()) {
+            continue;
+        }
+
         for (auto& car : cars) {
             float px = player.position.x;
             float py = player.position.y;
