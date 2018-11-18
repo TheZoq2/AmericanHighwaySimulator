@@ -67,15 +67,17 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         float amount = this->transparency_time/TRANSPARENCY_TIME;
         if(this->is_bmv()) {
             amount = this->bmv_time/BMV_TIME;
-        } else if (this->is_sleepy() || this->is_inverted()) {
+        } else if (this->is_sleepy()){
             amount = this->sleepy_time/SLEEPY_TIME;
+        } else if (this->is_inverted()) {
+            amount = this->inverted_time/INVERTED_TIME;
         }
         sf::RectangleShape transparency_bar
             {sf::Vector2f{amount*PLAYER_WIDTH, TRANSPARENCY_BAR_HEIGHT}};
         sf::Vector2f bar_pos = this->position + 
             sf::Vector2f{-PLAYER_WIDTH/2, PLAYER_HEIGHT*0.7};
         transparency_bar.setPosition(bar_pos);
-        if (this->is_sleepy()) {
+        if (this->is_sleepy() || this->is_inverted()) {
             transparency_bar.setFillColor(sf::Color{255, 0, 0, 255});
         } else {
             transparency_bar.setFillColor(sf::Color{50, 50, 255, 255});
