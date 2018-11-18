@@ -169,6 +169,9 @@ void Level::update_players_handle_input(float delta_time) {
         player.just_collided_with = collided;
 
         if (player.input_handler->get_value(input::Action::FIRE) &&
+                !player.is_sleepy() &&
+                !player.is_bmv() &&
+                !player.is_transparent() &&
             (player.powerup != nullptr || player.selection_mode)) {
             if (!player.already_entered_selection) {
                 fire_player_powerup(&player);
@@ -396,7 +399,8 @@ void Level::update_and_spawn_powerups(float delta_time) {
         PowerUp* powerup = &powerups[i];
         for (auto& player : players) {
             if (powerup_collides_with_player(powerup, &player) &&
-                !player.selection_mode) {
+                !player.selection_mode &&
+                !player.is_sleepy()) {
                 // copy the powerup to the player
                 PowerUp* p = new PowerUp(*powerup);
                 player.set_powerup(p);

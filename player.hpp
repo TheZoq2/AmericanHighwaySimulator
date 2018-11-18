@@ -23,6 +23,7 @@ public:
 
     bool is_transparent() const;
     bool is_sleepy() const;
+    bool is_bmv() const;
 
     std::string name;
     sf::Vector2f position;
