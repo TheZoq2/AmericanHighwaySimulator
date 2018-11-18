@@ -10,7 +10,7 @@ Car::Car(VehicleType type, sf::Vector2f position, Assets& assets) {
 
     if (type == VehicleType::POLICE) {
         this->sound = assets.siren.get_sound();
-        this->sound->setVolume(90.f);
+        this->sound->setVolume(70.f);
         this->sound->play();
     }
 
