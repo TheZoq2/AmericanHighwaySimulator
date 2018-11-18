@@ -86,10 +86,13 @@ private:
     void deactivate_target_selection(Player* p);
     void update_target_selection(Player* p, float delta_time);
     void update_sleepiness(Player* p, float delta_time);
+    void update_invertedness(Player* p, float delta_time);
     void activate_sleepy_powerup(Player* p);
     void actually_fire_sleepy_powerup(Player* p);
+    void actually_fire_inverted_powerup(Player* p);
     void activate_transparency_powerup(Player* p);
     void activate_bmv_powerup(Player* p);
+    void activate_inverted_powerup(Player* p);
     void car_on_car_collision();
 };
 

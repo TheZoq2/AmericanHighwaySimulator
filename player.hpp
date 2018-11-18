@@ -23,6 +23,7 @@ public:
 
     bool is_transparent() const;
     bool is_sleepy() const;
+    bool is_inverted() const;
     bool is_bmv() const;
 
     std::string name;
@@ -53,10 +54,13 @@ public:
     float selection_time = 0;
 
     float sleepy_time = 0;
+    float inverted_time = 0;
 
     Player* selected_by = nullptr;
     size_t selected_target_index;
     bool already_entered_selection = false;
+
+    PowerUpType next_powerup = PowerUpType::INVERTED;
 
     float r, g, b;
 private:

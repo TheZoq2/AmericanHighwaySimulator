@@ -62,11 +62,12 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         this->powerup->draw_mini(target, assets, powerup_pos);
     }
 
-    if (this->is_transparent() || this->is_bmv() || this->is_sleepy()) {
+    if (this->is_transparent() || this->is_bmv() || 
+            this->is_sleepy() || this->is_inverted()) {
         float amount = this->transparency_time/TRANSPARENCY_TIME;
         if(this->is_bmv()) {
             amount = this->bmv_time/BMV_TIME;
-        } else if (this->is_sleepy()) {
+        } else if (this->is_sleepy() || this->is_inverted()) {
             amount = this->sleepy_time/SLEEPY_TIME;
         }
         sf::RectangleShape transparency_bar
@@ -106,6 +107,10 @@ void Player::set_powerup(PowerUp* p) {
 
 bool Player::is_sleepy() const {
     return sleepy_time > 0;
+}
+
+bool Player::is_inverted() const {
+    return inverted_time > 0;
 }
 
 bool Player::is_bmv() const {

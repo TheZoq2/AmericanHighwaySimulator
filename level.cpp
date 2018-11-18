@@ -140,11 +140,16 @@ void Level::update_players_handle_input(float delta_time) {
             acceleration *= BMV_ACC_MODIFIER;
         }
 
+        if (player.is_inverted()) {
+            acceleration *= (float)-1.0;
+        }
+
         if (!player.is_sleepy()) {
             player.velocity += acceleration;
-        } else {
-            update_sleepiness(&player, delta_time);
         }
+
+        update_sleepiness(&player, delta_time);
+        update_invertedness(&player, delta_time);
 
         if (player.velocity.x > PLAYER_MAX_VEL_X) {
             player.velocity.x = PLAYER_MAX_VEL_X;
@@ -421,7 +426,11 @@ bool Level::powerup_collides_with_player(PowerUp* pu, Player* p) const {
 
 void Level::fire_player_powerup(Player* p) {
     if (p->powerup == nullptr) {
-        activate_sleepy_powerup(p);
+        if (p->next_powerup == PowerUpType::INVERTED) {
+            activate_inverted_powerup(p);
+        } else if (p->next_powerup == PowerUpType::SLEEPY) {
+            activate_sleepy_powerup(p);
+        }
         return;
     }
     switch (p->powerup->type) {
@@ -434,6 +443,9 @@ void Level::fire_player_powerup(Player* p) {
         case PowerUpType::BMV:
             activate_bmv_powerup(p);
             break;
+        case PowerUpType::INVERTED:
+            activate_inverted_powerup(p);
+            break;
     }
     delete p->powerup;
     p->powerup = nullptr;
@@ -445,7 +457,14 @@ void Level::actually_fire_sleepy_powerup(Player* p) {
     target->sleepy_time = SLEEPY_TIME;
 }
 
+void Level::actually_fire_inverted_powerup(Player* p) {
+    size_t index = p->selected_target_index;
+    Player* target = &players[index];
+    target->inverted_time = INVERTED_TIME;
+}
+
 void Level::activate_sleepy_powerup(Player* p) {
+    p->next_powerup = PowerUpType::SLEEPY;
     if (p->selection_mode) {
         std::cout << "Sleepy!" << std::endl;
         deactivate_target_selection(p);
@@ -458,7 +477,15 @@ void Level::activate_sleepy_powerup(Player* p) {
 }
 
 void Level::update_sleepiness(Player* p, float delta_time) {
-    p->sleepy_time -= delta_time;
+    if (p->is_sleepy()) {
+        p->sleepy_time -= delta_time;
+    }
+}
+
+void Level::update_invertedness(Player* p, float delta_time) {
+    if (p->is_inverted()) {
+        p->inverted_time -= delta_time;
+    }
 }
 
 void Level::activate_transparency_powerup(Player* p) {
@@ -469,6 +496,19 @@ void Level::activate_transparency_powerup(Player* p) {
 void Level::activate_bmv_powerup(Player* p) {
     p->bmv_time = BMV_TIME;
     std::cout << "Brutto Mational Value!" << std::endl;
+}
+
+void Level::activate_inverted_powerup(Player* p) {
+    p->next_powerup = PowerUpType::INVERTED;
+    if (p->selection_mode) {
+        std::cout << "INVERTED!" << std::endl;
+        deactivate_target_selection(p);
+        actually_fire_inverted_powerup(p);
+    } else {
+        if (!this->someone_selecting) {
+            activate_target_selection(p);
+        }
+    }
 }
 
 void Level::activate_target_selection(Player* p) {
