@@ -327,6 +327,7 @@ void Level::on_player_collision_with_car(Player* p, Car* c, Assets& assets) {
         p->collidee = c;
         p->persistent_acceleration.x +=
             (random() % COLLISION_MAX_BREAKAGE) - COLLISION_MAX_BREAKAGE / 2;
+        p->persistent_acceleration *= (float) 0.3;
 
         if(c->type != VehicleType::MOTORBIKE) {
             // Update health
@@ -359,8 +360,8 @@ void Level::on_player_collision_with_car(Player* p, Car* c, Assets& assets) {
             );
             this->macke->play();
         }
+        this->crash->play();
     }
-    this->crash->play();
 }
 
 CarCollisionResult Level::check_car_collisions() {
