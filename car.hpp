@@ -10,7 +10,8 @@ enum class VehicleType {
     TRUCK,
     MOTORBIKE,
     TRACTOR,
-    ROCK
+    ROCK,
+    POLICE
 };
 
 class Car {

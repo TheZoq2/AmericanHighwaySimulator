@@ -20,6 +20,8 @@ const int ROCK_SIZE = 200;
 const int MOTORCYCLE_WIDTH = 40;
 const int MOTORCYCLE_HEIGHT = 100;
 const int TRUCK_HEIGHT = 320;
+const float POLICE_SPEED = -CAR_SPEED * 4;
+const float POLICE_SPAWN_DISTANCE = 1500 + WINDOW_HEIGHT;
 
 const int PLAYER_WIDTH = 119;
 const int PLAYER_HEIGHT = 249;

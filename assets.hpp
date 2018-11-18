@@ -42,5 +42,7 @@ public:
     Asset bmv;
     Asset crosshair;
     Asset inverted;
+    Asset police;
+    Asset police_lights[2];
 };
 #endif
