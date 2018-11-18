@@ -18,6 +18,9 @@ Player::Player(
     new_color();
 }
 
+bool Player::is_transparent() const {
+    return this->transparency_time > 0;
+}
 
 void Player::draw(sf::RenderTarget* target, Assets& assets) const {
     float visual_angle = atan2(velocity.x, 100) * 10;
@@ -38,7 +41,7 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         asset = assets.generic_car[1];
     }
     sf::Color c;
-    if (this->transparency_time > 0) {
+    if (this->is_transparent()) {
         c = sf::Color(r, g, b, TRANSPARENCY_OPACITY);
     } else {
         c = sf::Color(r, g, b);
@@ -57,12 +60,12 @@ void Player::draw(sf::RenderTarget* target, Assets& assets) const {
         this->powerup->draw_mini(target, assets, powerup_pos);
     }
 
-    if (this->transparency_time > 0) {
+    if (this->is_transparent()) {
         float amount = this->transparency_time/TRANSPARENCY_TIME;
         sf::RectangleShape transparency_bar
             {sf::Vector2f{amount*PLAYER_WIDTH, TRANSPARENCY_BAR_HEIGHT}};
         sf::Vector2f bar_pos = this->position + 
-            sf::Vector2f{0, PLAYER_HEIGHT*0.7};
+            sf::Vector2f{-PLAYER_WIDTH/2, PLAYER_HEIGHT*0.7};
         transparency_bar.setPosition(bar_pos);
         transparency_bar.setFillColor(sf::Color{50, 50, 255, 255});
         target->draw(transparency_bar);

@@ -21,6 +21,7 @@ public:
     void set_powerup(PowerUp* p);
     void new_color();
 
+    bool is_transparent() const;
 
     std::string name;
     sf::Vector2f position;
