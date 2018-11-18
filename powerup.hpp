@@ -5,7 +5,7 @@
 #include "assets.hpp"
 
 enum PowerUpType {
-    SLEEPY, TRANSPARENCY, BMV,
+    SLEEPY, TRANSPARENCY, BMV, INVERTED,
     NUM_POWERUPS
 };
 

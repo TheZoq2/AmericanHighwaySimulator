@@ -75,7 +75,8 @@ Assets::Assets() :
         Asset("../resources/tractor_broken.png")
     },
     bmv("../resources/bmv.png"),
-    crosshair("../resources/crosshair.png")
+    crosshair("../resources/crosshair.png"),
+    inverted("../resources/inverted.png")
 {
     lane.set_origin(0,0);
 }
