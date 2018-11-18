@@ -94,6 +94,9 @@ void Player::set_powerup(PowerUp* p) {
     this->powerup = p;
 }
 
+bool Player::is_sleepy() const {
+    return sleepy_time > 0;
+}
 
 void Player::new_color() {
     r = random() % 255;

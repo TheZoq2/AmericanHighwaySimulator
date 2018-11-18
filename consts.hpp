@@ -47,4 +47,6 @@ const float TARGET_SELECTION_ANGLE_SPEED = 100;
 
 const float WRECK_RETARDATION = 0.8;
 
+const float SLEEPY_TIME = 2;
+
 #endif
