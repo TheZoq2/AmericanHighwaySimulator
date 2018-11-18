@@ -94,6 +94,7 @@ void Level::update(float delta_time) {
 
 void Level::update_players_handle_input(float delta_time) {
     for (auto& player : players) {
+        player.update_engine_noise();
         update_target_selection(&player, delta_time);
         player.shake_left -= delta_time;
 
@@ -606,4 +607,22 @@ void Level::car_on_car_collision() {
             }
         }
     }
+}
+
+int Level::get_players_left() {
+    int cars_alive = 0;
+    for (auto& player : players) {
+        if (!player.wrecked) {
+            cars_alive++;
+        }
+    }
+    return cars_alive;
+}
+
+void Level::reset_players() {
+    players.clear();
+}
+
+void Level::reset_cars() {
+    cars.clear();
 }

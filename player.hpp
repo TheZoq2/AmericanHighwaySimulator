@@ -14,12 +14,13 @@ class Player {
 public:
     
     Player(std::string name, input::InputHandler* input_handler, 
-            sf::Vector2f start_position);
+            sf::Vector2f start_position, Assets& assets);
 
     void draw(sf::RenderTarget* target, Assets& assets) const;
 
     void set_powerup(PowerUp* p);
     void new_color();
+    void update_engine_noise();
 
     bool is_transparent() const;
     bool is_sleepy() const;
@@ -63,10 +64,15 @@ public:
     PowerUpType next_powerup = PowerUpType::INVERTED;
 
     float r, g, b;
+
+    sf::Sound* engine_noise;
+
 private:
     void draw_lights(sf::RenderTarget* target, float visual_angle, Assets& assets) const;
 
 
 };
+
+
 
 #endif /* ifndef PLAYER_H */

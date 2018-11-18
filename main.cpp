@@ -39,6 +39,8 @@ int main() {
     typedef std::chrono::duration<float> FloatSeconds;
     float next_time_step = 0;
 
+    bool is_game_over = false;
+
     while(window.isOpen()) {
         auto frame_start = std::chrono::steady_clock::now().time_since_epoch();
         sf::Event event;
@@ -53,7 +55,10 @@ int main() {
 
         if(!player_selection.done) {
             player_selection.draw(&window, assets);
-            player_selection.run();
+            player_selection.run(assets);
+            level.reset_players();
+            level.reset_cars();
+            is_game_over = false;
 
             if(player_selection.done) {
                 auto players = player_selection.players;
@@ -65,6 +70,14 @@ int main() {
 
                     level.add_player(players[i]);
                 }
+            }
+        }
+        else if (level.get_players_left() < 1 && !is_game_over) {
+            assets.game_over.set_origin(0,0);
+            assets.game_over.draw(&window, sf::Vector2f(0,0));
+
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace) && player_selection.done) {
+                player_selection.done = false;
             }
         }
         else {
